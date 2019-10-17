@@ -285,7 +285,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [0, 45, 0]},
+                    {"translate": [0, 40, 0]},
                     {"scale": [20, 40, 20]}
                ],
                 "child": {
@@ -299,7 +299,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [0, 65, 0]},
+                    {"translate": [0, 60, 0]},
                     {"scale": [20, 40, 20]}
                 ],
                 "child": {
@@ -313,7 +313,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [-10, 45, 0]},
+                    {"translate": [-10, 37.5, 0]},
                     {"scale": [8, 30, 8]}
                 ],
                 "child": {
@@ -327,7 +327,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [10, 45, 0]},
+                    {"translate": [10, 37.5, 0]},
                     {"scale": [8, 30, 8]}
                 ],
                 "child": {
@@ -342,7 +342,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [0, 45, 10]},
+                    {"translate": [0, 37.5, 10]},
                     {"scale": [8, 30, 8]}
                 ],
                 "child": {
@@ -356,7 +356,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [0, 45, -10]},
+                    {"translate": [0, 37.5, -10]},
                     {"scale": [8, 30, 8]}
                 ],
                 "child": {
@@ -370,7 +370,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [10,58, 0]},
+                    {"translate": [10,50, 0]},
                     {"scale": [8, 20, 8]}
                 ],
                 "child": {
@@ -384,7 +384,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [-10,58, 0]},
+                    {"translate": [-10,50, 0]},
                     {"scale": [8, 20, 8]}
                 ],
                 "child": {
@@ -398,7 +398,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [0,58, 10]},
+                    {"translate": [0,50, 10]},
                     {"scale": [8, 20, 8]}
                 ],
                 "child": {
@@ -412,7 +412,7 @@ export class View {
             {
                 "type": "transform",
                 "transform": [
-                    {"translate": [0,58, -10]},
+                    {"translate": [0,50, -10]},
                     {"scale": [8, 20, 8]}
                 ],
                 "child": {
