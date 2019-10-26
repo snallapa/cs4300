@@ -16874,6 +16874,12 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.keyFrames = [];
             this.child = null;
             this.time = 0;
+            this.showLines = false;
+            window.addEventListener("keydown", ev => {
+                if (ev.code === "KeyS") {
+                    this.showLines = !this.showLines;
+                }
+            });
         }
         /**
          * Creates a deep copy of the subtree rooted at this node
@@ -16936,6 +16942,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
          */
         draw(context, modelView) {
             modelView.push(gl_matrix_1.mat4.clone(modelView.peek()));
+            if (this.showLines) {
+                context.drawKeyframe(this.keyFrames, modelView.peek());
+            }
             gl_matrix_1.mat4.multiply(modelView.peek(), modelView.peek(), this.animationTransform);
             const v = this.keyFrames[this.time];
             if (v) {
@@ -17527,7 +17536,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         }
         addTexture(name, path) {
             let image;
-            let imageFormat = path.substring(path.indexOf('.') + 1);
+            let imageFormat = path.substring(path.indexOf(".") + 1);
             image = WebGLUtils.loadTexture(this.gl, path);
             this.textures.set(name, image);
         }
@@ -17566,6 +17575,30 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 this.gl.uniformMatrix4fv(loc, false, transformation);
                 this.meshRenderers.get(meshName).draw(this.shaderLocations);
             }
+        }
+        drawKeyframe(vertices, transform) {
+            const vbo = this.gl.createBuffer();
+            const points = [];
+            vertices.forEach(v => {
+                points.push(v[0]);
+                points.push(v[1]);
+                points.push(v[2]);
+            });
+            let loc = this.shaderLocations.getUniformLocation("vColor");
+            //set the color for all vertices to be drawn for this object
+            let color = gl_matrix_1.vec4.fromValues(1, 1, 0, 1);
+            this.gl.uniform4fv(loc, color);
+            loc = this.shaderLocations.getUniformLocation("modelview");
+            this.gl.uniformMatrix4fv(loc, false, transform);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbo);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(points), this.gl.STATIC_DRAW);
+            const positionLocation = this.shaderLocations.getAttribLocation("vPosition");
+            //tell webgl that the position attribute can be found as 2-floats-per-vertex with a gap of 20 bytes
+            //(2 floats per position, 3 floats per color = 5 floats = 20 bytes
+            this.gl.vertexAttribPointer(positionLocation, 3, this.gl.FLOAT, false, 0, 0);
+            //tell webgl to enable this vertex attribute array, so that when it draws it will use this
+            this.gl.enableVertexAttribArray(positionLocation);
+            this.gl.drawArrays(this.gl.LINE_LOOP, 0, vertices.length);
         }
     }
     exports.ScenegraphRenderer = ScenegraphRenderer;
@@ -19555,8 +19588,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
               "type": "keyframe",
               "keyframes": "models/camerapath.txt",
               "transform": [
-                {"rotate":[180, 0, 1, 0]},
-                {"rotate": [90, 1, 0, 0]}
+                {"scale": [0.6, 0.6, 0.6]},
+                {"rotate": [270, 1, 0, 0]}
               ],
               "child": {
                 "type": "object",
@@ -20208,8 +20241,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             else {
                 gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(100 * Math.cos(this.time / 50) + 70, 90, 100 * Math.sin(this.time / 50) - 10), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
             }
-            //front view
-            //camera looking down at the figure
             this.gl.uniformMatrix4fv(this.shaderLocations.getUniformLocation("proj"), false, this.proj);
             this.scenegraph.draw(this.modelview);
         }
@@ -20218,7 +20249,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         }
         setFeatures(features) { }
         keyPress(keyEvent) {
-            console.log(keyEvent);
             switch (keyEvent) {
                 case "KeyT":
                     this.cameraMode = CameraMode.Rotate;

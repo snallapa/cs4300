@@ -1797,8 +1797,8 @@ export class View {
               "type": "keyframe",
               "keyframes": "models/camerapath.txt",
               "transform": [
-                {"rotate":[180, 0, 1, 0]},
-                {"rotate": [90, 1, 0, 0]}
+                {"scale": [0.6, 0.6, 0.6]},
+                {"rotate": [270, 1, 0, 0]}
               ],
               "child": {
                 "type": "object",
@@ -2476,10 +2476,6 @@ export class View {
       );
     }
 
-    //front view
-
-    //camera looking down at the figure
-
     this.gl.uniformMatrix4fv(
       this.shaderLocations.getUniformLocation("proj"),
       false,
@@ -2496,7 +2492,6 @@ export class View {
   public setFeatures(features: Features): void {}
 
   public keyPress(keyEvent: string): void {
-    console.log(keyEvent);
     switch (keyEvent) {
       case "KeyT":
         this.cameraMode = CameraMode.Rotate;

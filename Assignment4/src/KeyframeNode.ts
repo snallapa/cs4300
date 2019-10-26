@@ -20,6 +20,7 @@ export class KeyframeNode extends SGNode {
   protected animationTransform: mat4;
   private keyFrames: number[][];
   private time: number;
+  private showLines: boolean;
 
   /**
    * A reference to its only child
@@ -33,6 +34,12 @@ export class KeyframeNode extends SGNode {
     this.keyFrames = [];
     this.child = null;
     this.time = 0;
+    this.showLines = false;
+    window.addEventListener("keydown", ev => {
+      if (ev.code === "KeyS") {
+        this.showLines = !this.showLines;
+      }
+    });
   }
 
   /**
@@ -105,6 +112,9 @@ export class KeyframeNode extends SGNode {
 
   public draw(context: ScenegraphRenderer, modelView: Stack<mat4>) {
     modelView.push(mat4.clone(modelView.peek()));
+    if (this.showLines) {
+      context.drawKeyframe(this.keyFrames, modelView.peek());
+    }
     mat4.multiply(modelView.peek(), modelView.peek(), this.animationTransform);
     const v = this.keyFrames[this.time];
     if (v) {
