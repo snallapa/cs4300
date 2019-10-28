@@ -115,25 +115,20 @@ export class KeyframeNode extends SGNode {
     if (this.showLines) {
       context.drawKeyframe(this.keyFrames, modelView.peek());
     }
-    mat4.multiply(modelView.peek(), modelView.peek(), this.animationTransform);
+
     const v = this.keyFrames[this.time];
     if (v) {
       const v2 = this.keyFrames[(this.time + 1) % this.keyFrames.length];
       const up = vec3.fromValues(v[3], v[4], v[5]);
       const currentPosition = vec3.fromValues(v[0], v[1], v[2]);
       const nextPosition = vec3.fromValues(v2[0], v2[1], v2[2]);
-      const look = mat4.targetTo(
-        mat4.create(),
-        vec3.fromValues(0, 0, 0),
-        vec3.sub(vec3.create(), nextPosition, currentPosition),
-        up
+      this.setAnimationTransform(
+        mat4.targetTo(mat4.create(), currentPosition, nextPosition, up)
       );
-      mat4.translate(modelView.peek(), modelView.peek(), currentPosition);
-      mat4.multiply(modelView.peek(), modelView.peek(), look);
-
       this.time = this.time + 1;
       this.time = this.time % this.keyFrames.length;
     }
+    mat4.multiply(modelView.peek(), modelView.peek(), this.animationTransform);
     mat4.multiply(modelView.peek(), modelView.peek(), this.transform);
 
     if (this.child != null) this.child.draw(context, modelView);
@@ -145,7 +140,7 @@ export class KeyframeNode extends SGNode {
    * @param mat the animation transform of this node
    */
   public setAnimationTransform(mat: mat4): void {
-    this.animationTransform = mat;
+    this.animationTransform = mat4.clone(mat);
   }
 
   /**

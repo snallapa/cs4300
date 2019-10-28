@@ -91,6 +91,7 @@ export class Scenegraph<VertexType extends IVertexData> {
 
 
     public animate(time: number): void {
+        
     }
 
     public addNode(nodeName: string, node: SGNode): void {

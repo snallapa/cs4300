@@ -16945,19 +16945,17 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             if (this.showLines) {
                 context.drawKeyframe(this.keyFrames, modelView.peek());
             }
-            gl_matrix_1.mat4.multiply(modelView.peek(), modelView.peek(), this.animationTransform);
             const v = this.keyFrames[this.time];
             if (v) {
                 const v2 = this.keyFrames[(this.time + 1) % this.keyFrames.length];
                 const up = gl_matrix_1.vec3.fromValues(v[3], v[4], v[5]);
                 const currentPosition = gl_matrix_1.vec3.fromValues(v[0], v[1], v[2]);
                 const nextPosition = gl_matrix_1.vec3.fromValues(v2[0], v2[1], v2[2]);
-                const look = gl_matrix_1.mat4.targetTo(gl_matrix_1.mat4.create(), gl_matrix_1.vec3.fromValues(0, 0, 0), gl_matrix_1.vec3.sub(gl_matrix_1.vec3.create(), nextPosition, currentPosition), up);
-                gl_matrix_1.mat4.translate(modelView.peek(), modelView.peek(), currentPosition);
-                gl_matrix_1.mat4.multiply(modelView.peek(), modelView.peek(), look);
+                this.setAnimationTransform(gl_matrix_1.mat4.targetTo(gl_matrix_1.mat4.create(), currentPosition, nextPosition, up));
                 this.time = this.time + 1;
                 this.time = this.time % this.keyFrames.length;
             }
+            gl_matrix_1.mat4.multiply(modelView.peek(), modelView.peek(), this.animationTransform);
             gl_matrix_1.mat4.multiply(modelView.peek(), modelView.peek(), this.transform);
             if (this.child != null)
                 this.child.draw(context, modelView);
@@ -16968,7 +16966,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
          * @param mat the animation transform of this node
          */
         setAnimationTransform(mat) {
-            this.animationTransform = mat;
+            this.animationTransform = gl_matrix_1.mat4.clone(mat);
         }
         /**
          * Gets the transform at this node (not the animation transform)
@@ -17855,6 +17853,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         CameraMode[CameraMode["Rotate"] = 0] = "Rotate";
         CameraMode[CameraMode["Overhead"] = 1] = "Overhead";
         CameraMode[CameraMode["Front"] = 2] = "Front";
+        CameraMode[CameraMode["Cockpit"] = 3] = "Cockpit";
     })(CameraMode || (CameraMode = {}));
     class View {
         constructor(gl) {
@@ -17865,7 +17864,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             //set the clear color
             this.gl.clearColor(0.9, 0.9, 0.7, 1);
             //Our quad is in the range (-100,100) in X and Y, in the "virtual world" that we are drawing. We must specify what part of this virtual world must be drawn. We do this via a projection matrix, set up as below. In this case, we are going to render the part of the virtual world that is inside a square from (-200,-200) to (200,200). Since we are drawing only 2D, the last two arguments are not useful. The default Z-value chosen is 0, which means we only specify the last two numbers such that 0 is within their range (in this case we have specified them as (-100,100))
-            this.proj = gl_matrix_1.mat4.ortho(gl_matrix_1.mat4.create(), -100, 100, -100, 100, 0.1, 10000);
+            // this.proj = mat4.ortho(mat4.create(), -100, 100, -100, 100, 0.1, 10000);
+            this.proj = gl_matrix_1.mat4.perspective(gl_matrix_1.mat4.create(), gl_matrix_1.glMatrix.toRadian(60), 1, 1, 1000);
             //We must also specify "where" the above part of the virtual world will be shown on the actual canvas on screen. This part of the screen where the above drawing gets pasted is called the "viewport", which we set here. The origin of the viewport is left,bottom. In this case we want it to span the entire canvas, so we start at (0,0) with a width and height of 400 each (matching the dimensions of the canvas specified in HTML)
             this.gl.viewport(0, 0, 400, 400);
             this.cameraMode = CameraMode.Front;
@@ -19586,9 +19586,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             },
             {
               "type": "keyframe",
+              "name": "plane",
               "keyframes": "models/camerapath.txt",
               "transform": [
-                {"scale": [0.6, 0.6, 0.6]},
+                {"scale": [0.3, 0.3, 0.3]},
                 {"rotate": [270, 1, 0, 0]}
               ],
               "child": {
@@ -20232,14 +20233,28 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
              */
             this.modelview.push(gl_matrix_1.mat4.create());
             this.modelview.push(gl_matrix_1.mat4.clone(this.modelview.peek()));
-            if (this.cameraMode == CameraMode.Front) {
-                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(100, 100, 160), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
+            if (this.cameraMode === CameraMode.Front) {
+                this.proj = gl_matrix_1.mat4.perspective(gl_matrix_1.mat4.create(), gl_matrix_1.glMatrix.toRadian(60), 1, 1, 1000);
+                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(100, 100, 120), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
             }
-            else if (this.cameraMode == CameraMode.Overhead) {
+            else if (this.cameraMode === CameraMode.Overhead) {
+                this.proj = gl_matrix_1.mat4.ortho(gl_matrix_1.mat4.create(), -100, 100, -100, 100, 0.1, 10000);
                 gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(50, 200, -40), gl_matrix_1.vec3.fromValues(50, 50, -40), gl_matrix_1.vec3.fromValues(0, 0, -1));
             }
+            else if (this.cameraMode === CameraMode.Cockpit) {
+                this.proj = gl_matrix_1.mat4.perspective(gl_matrix_1.mat4.create(), gl_matrix_1.glMatrix.toRadian(60), 1, 1, 1000);
+                const nodes = this.scenegraph.getNodes();
+                const planeNode = nodes.get("plane");
+                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 0, -8), gl_matrix_1.vec3.fromValues(0, 0, -100), gl_matrix_1.vec3.fromValues(0, 1, 0));
+                const planeTransformation = planeNode.getAnimationTransform();
+                gl_matrix_1.mat4.translate(planeTransformation, planeTransformation, gl_matrix_1.vec3.fromValues(0, 0, 0));
+                let planeInverse = gl_matrix_1.mat4.create();
+                gl_matrix_1.mat4.invert(planeInverse, planeTransformation);
+                gl_matrix_1.mat4.multiply(this.modelview.peek(), this.modelview.peek(), planeInverse);
+            }
             else {
-                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(100 * Math.cos(this.time / 50) + 70, 90, 100 * Math.sin(this.time / 50) - 10), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
+                this.proj = gl_matrix_1.mat4.perspective(gl_matrix_1.mat4.create(), gl_matrix_1.glMatrix.toRadian(60), 1, 1, 1000);
+                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(130 * Math.cos(this.time / 50) + 70, 90, 130 * Math.sin(this.time / 50) - 10), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
             }
             this.gl.uniformMatrix4fv(this.shaderLocations.getUniformLocation("proj"), false, this.proj);
             this.scenegraph.draw(this.modelview);
@@ -20259,6 +20274,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 case "KeyO":
                     this.cameraMode = CameraMode.Overhead;
                     break;
+                case "KeyA":
+                    this.cameraMode = CameraMode.Cockpit;
             }
         }
     }
