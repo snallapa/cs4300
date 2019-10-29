@@ -117,15 +117,42 @@ export class KeyframeNode extends SGNode {
       context.drawKeyframe(this.keyframeFile, this.keyFrames, modelView.peek());
     }
 
-    const v = this.keyFrames[this.time];
-    if (v) {
-      const v2 = this.keyFrames[(this.time + 1) % this.keyFrames.length];
-      const up = vec3.fromValues(v[3], v[4], v[5]);
-      const currentPosition = vec3.fromValues(v[0], v[1], v[2]);
-      const nextPosition = vec3.fromValues(v2[0], v2[1], v2[2]);
-      this.setAnimationTransform(
-        mat4.targetTo(mat4.create(), currentPosition, nextPosition, up)
+    const frame = this.keyFrames[this.time];
+    if (frame) {
+      const nextFrame = this.keyFrames[(this.time + 1) % this.keyFrames.length];
+      const up = vec3.fromValues(frame[3], frame[4], frame[5]);
+      const currentPosition = vec3.fromValues(frame[0], frame[1], frame[2]);
+      const nextPosition = vec3.fromValues(
+        nextFrame[0],
+        nextFrame[1],
+        nextFrame[2]
       );
+      const w = vec3.sub(vec3.create(), currentPosition, nextPosition);
+      vec3.normalize(w, w);
+      let v = vec3.normalize(vec3.create(), up);
+      const u = vec3.cross(vec3.create(), v, w);
+      vec3.normalize(u, u);
+      v = vec3.cross(vec3.create(), w, u);
+      vec3.normalize(v, v);
+      const look = mat4.fromValues(
+        u[0],
+        u[1],
+        u[2],
+        0,
+        v[0],
+        v[1],
+        v[2],
+        0,
+        w[0],
+        w[1],
+        w[2],
+        0,
+        currentPosition[0],
+        currentPosition[1],
+        currentPosition[2],
+        1
+      );
+      this.setAnimationTransform(look);
       this.time = this.time + 1;
       this.time = this.time % this.keyFrames.length;
     }

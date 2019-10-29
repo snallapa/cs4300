@@ -16945,13 +16945,21 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             if (this.showLines) {
                 context.drawKeyframe(this.keyframeFile, this.keyFrames, modelView.peek());
             }
-            const v = this.keyFrames[this.time];
-            if (v) {
-                const v2 = this.keyFrames[(this.time + 1) % this.keyFrames.length];
-                const up = gl_matrix_1.vec3.fromValues(v[3], v[4], v[5]);
-                const currentPosition = gl_matrix_1.vec3.fromValues(v[0], v[1], v[2]);
-                const nextPosition = gl_matrix_1.vec3.fromValues(v2[0], v2[1], v2[2]);
-                this.setAnimationTransform(gl_matrix_1.mat4.targetTo(gl_matrix_1.mat4.create(), currentPosition, nextPosition, up));
+            const frame = this.keyFrames[this.time];
+            if (frame) {
+                const nextFrame = this.keyFrames[(this.time + 1) % this.keyFrames.length];
+                const up = gl_matrix_1.vec3.fromValues(frame[3], frame[4], frame[5]);
+                const currentPosition = gl_matrix_1.vec3.fromValues(frame[0], frame[1], frame[2]);
+                const nextPosition = gl_matrix_1.vec3.fromValues(nextFrame[0], nextFrame[1], nextFrame[2]);
+                const w = gl_matrix_1.vec3.sub(gl_matrix_1.vec3.create(), currentPosition, nextPosition);
+                gl_matrix_1.vec3.normalize(w, w);
+                let v = gl_matrix_1.vec3.normalize(gl_matrix_1.vec3.create(), up);
+                const u = gl_matrix_1.vec3.cross(gl_matrix_1.vec3.create(), v, w);
+                gl_matrix_1.vec3.normalize(u, u);
+                v = gl_matrix_1.vec3.cross(gl_matrix_1.vec3.create(), w, u);
+                gl_matrix_1.vec3.normalize(v, v);
+                const look = gl_matrix_1.mat4.fromValues(u[0], u[1], u[2], 0, v[0], v[1], v[2], 0, w[0], w[1], w[2], 0, currentPosition[0], currentPosition[1], currentPosition[2], 1);
+                this.setAnimationTransform(look);
                 this.time = this.time + 1;
                 this.time = this.time % this.keyFrames.length;
             }
