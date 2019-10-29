@@ -21,6 +21,7 @@ export class KeyframeNode extends SGNode {
   private keyFrames: number[][];
   private time: number;
   private showLines: boolean;
+  private keyframeFile: string;
 
   /**
    * A reference to its only child
@@ -113,7 +114,7 @@ export class KeyframeNode extends SGNode {
   public draw(context: ScenegraphRenderer, modelView: Stack<mat4>) {
     modelView.push(mat4.clone(modelView.peek()));
     if (this.showLines) {
-      context.drawKeyframe(this.keyFrames, modelView.peek());
+      context.drawKeyframe(this.keyframeFile, this.keyFrames, modelView.peek());
     }
 
     const v = this.keyFrames[this.time];
@@ -179,8 +180,8 @@ export class KeyframeNode extends SGNode {
     }
   }
 
-  public setKeyFrames(keyFramesFile: string): void {
-    fetch(keyFramesFile)
+  public setKeyFrames(keyframeFile: string): void {
+    fetch(keyframeFile)
       .then(response => response.text())
       .then(data => {
         let lines: string[] = data.split(/\r?\n/);
@@ -188,9 +189,12 @@ export class KeyframeNode extends SGNode {
         lines.forEach(line => {
           line = line.trim();
           let l = line.split(/\s+/);
-          let v: number[] = l.map(x => parseFloat(x));
-          this.keyFrames.push(v);
+          if (l.length === 6) {
+            let v: number[] = l.map(x => parseFloat(x));
+            this.keyFrames.push(v);
+          }
         });
       });
+    this.keyframeFile = keyframeFile;
   }
 }

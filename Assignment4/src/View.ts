@@ -2449,7 +2449,22 @@ export class View {
     this.gl.useProgram(this.shaderProgram);
 
     while (!this.modelview.isEmpty()) this.modelview.pop();
-
+    const perspectiveCamera = mat4.perspective(
+      mat4.create(),
+      glMatrix.toRadian(60),
+      1,
+      1,
+      1000
+    );
+    const orthoCamera = mat4.ortho(
+      mat4.create(),
+      -100,
+      100,
+      -100,
+      100,
+      0.1,
+      10000
+    );
     /*
      *In order to change the shape of this triangle, we can either move the vertex positions above, or "transform" them
      * We use a modelview matrix to store the transformations to be applied to our triangle.
@@ -2459,13 +2474,7 @@ export class View {
     this.modelview.push(mat4.clone(this.modelview.peek()));
 
     if (this.cameraMode === CameraMode.Front) {
-      this.proj = mat4.perspective(
-        mat4.create(),
-        glMatrix.toRadian(60),
-        1,
-        1,
-        1000
-      );
+      this.proj = perspectiveCamera;
       mat4.lookAt(
         this.modelview.peek(),
         vec3.fromValues(100, 100, 120),
@@ -2473,7 +2482,7 @@ export class View {
         vec3.fromValues(0, 1, 0)
       );
     } else if (this.cameraMode === CameraMode.Overhead) {
-      this.proj = mat4.ortho(mat4.create(), -100, 100, -100, 100, 0.1, 10000);
+      this.proj = orthoCamera;
       mat4.lookAt(
         this.modelview.peek(),
         vec3.fromValues(50, 200, -40),
@@ -2481,38 +2490,22 @@ export class View {
         vec3.fromValues(0, 0, -1)
       );
     } else if (this.cameraMode === CameraMode.Cockpit) {
-      this.proj = mat4.perspective(
-        mat4.create(),
-        glMatrix.toRadian(60),
-        1,
-        1,
-        1000
-      );
+      this.proj = perspectiveCamera;
       const nodes = this.scenegraph.getNodes();
       const planeNode = <KeyframeNode>nodes.get("plane");
       mat4.lookAt(
         this.modelview.peek(),
-        vec3.fromValues(0, 0, -8),
+        vec3.fromValues(0, 0, -2),
         vec3.fromValues(0, 0, -100),
         vec3.fromValues(0, 1, 0)
       );
+
       const planeTransformation = planeNode.getAnimationTransform();
-      mat4.translate(
-        planeTransformation,
-        planeTransformation,
-        vec3.fromValues(0, 0, 0)
-      );
       let planeInverse: mat4 = mat4.create();
       mat4.invert(planeInverse, planeTransformation);
       mat4.multiply(this.modelview.peek(), this.modelview.peek(), planeInverse);
     } else {
-      this.proj = mat4.perspective(
-        mat4.create(),
-        glMatrix.toRadian(60),
-        1,
-        1,
-        1000
-      );
+      this.proj = perspectiveCamera;
       mat4.lookAt(
         this.modelview.peek(),
         vec3.fromValues(

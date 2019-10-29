@@ -16943,7 +16943,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         draw(context, modelView) {
             modelView.push(gl_matrix_1.mat4.clone(modelView.peek()));
             if (this.showLines) {
-                context.drawKeyframe(this.keyFrames, modelView.peek());
+                context.drawKeyframe(this.keyframeFile, this.keyFrames, modelView.peek());
             }
             const v = this.keyFrames[this.time];
             if (v) {
@@ -17000,8 +17000,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 this.child.setScenegraph(graph);
             }
         }
-        setKeyFrames(keyFramesFile) {
-            fetch(keyFramesFile)
+        setKeyFrames(keyframeFile) {
+            fetch(keyframeFile)
                 .then(response => response.text())
                 .then(data => {
                 let lines = data.split(/\r?\n/);
@@ -17009,10 +17009,13 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 lines.forEach(line => {
                     line = line.trim();
                     let l = line.split(/\s+/);
-                    let v = l.map(x => parseFloat(x));
-                    this.keyFrames.push(v);
+                    if (l.length === 6) {
+                        let v = l.map(x => parseFloat(x));
+                        this.keyFrames.push(v);
+                    }
                 });
             });
+            this.keyframeFile = keyframeFile;
         }
     }
     exports.KeyframeNode = KeyframeNode;
@@ -17507,6 +17510,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.shaderVarsToVertexAttribs = shaderVarsToAttribs;
             this.meshRenderers = new Map();
             this.shaderLocations = shaderLocations;
+            this.keyframeBuffers = new Map();
         }
         /**
          * Add a mesh to be drawn later.
@@ -17574,7 +17578,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 this.meshRenderers.get(meshName).draw(this.shaderLocations);
             }
         }
-        drawKeyframe(vertices, transform) {
+        bufferKeyframes(keyframe, vertices) {
             const vbo = this.gl.createBuffer();
             const points = [];
             vertices.forEach(v => {
@@ -17582,14 +17586,22 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 points.push(v[1]);
                 points.push(v[2]);
             });
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbo);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(points), this.gl.STATIC_DRAW);
+            this.keyframeBuffers.set(keyframe, vbo);
+        }
+        drawKeyframe(keyframe, vertices, transform) {
             let loc = this.shaderLocations.getUniformLocation("vColor");
             //set the color for all vertices to be drawn for this object
             let color = gl_matrix_1.vec4.fromValues(1, 1, 0, 1);
             this.gl.uniform4fv(loc, color);
             loc = this.shaderLocations.getUniformLocation("modelview");
             this.gl.uniformMatrix4fv(loc, false, transform);
+            if (!this.keyframeBuffers.has(keyframe)) {
+                this.bufferKeyframes(keyframe, vertices);
+            }
+            const vbo = this.keyframeBuffers.get(keyframe);
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbo);
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(points), this.gl.STATIC_DRAW);
             const positionLocation = this.shaderLocations.getAttribLocation("vPosition");
             //tell webgl that the position attribute can be found as 2-floats-per-vertex with a gap of 20 bytes
             //(2 floats per position, 3 floats per color = 5 floats = 20 bytes
@@ -20226,6 +20238,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.gl.useProgram(this.shaderProgram);
             while (!this.modelview.isEmpty())
                 this.modelview.pop();
+            const perspectiveCamera = gl_matrix_1.mat4.perspective(gl_matrix_1.mat4.create(), gl_matrix_1.glMatrix.toRadian(60), 1, 1, 1000);
+            const orthoCamera = gl_matrix_1.mat4.ortho(gl_matrix_1.mat4.create(), -100, 100, -100, 100, 0.1, 10000);
             /*
              *In order to change the shape of this triangle, we can either move the vertex positions above, or "transform" them
              * We use a modelview matrix to store the transformations to be applied to our triangle.
@@ -20234,26 +20248,25 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.modelview.push(gl_matrix_1.mat4.create());
             this.modelview.push(gl_matrix_1.mat4.clone(this.modelview.peek()));
             if (this.cameraMode === CameraMode.Front) {
-                this.proj = gl_matrix_1.mat4.perspective(gl_matrix_1.mat4.create(), gl_matrix_1.glMatrix.toRadian(60), 1, 1, 1000);
+                this.proj = perspectiveCamera;
                 gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(100, 100, 120), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
             }
             else if (this.cameraMode === CameraMode.Overhead) {
-                this.proj = gl_matrix_1.mat4.ortho(gl_matrix_1.mat4.create(), -100, 100, -100, 100, 0.1, 10000);
+                this.proj = orthoCamera;
                 gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(50, 200, -40), gl_matrix_1.vec3.fromValues(50, 50, -40), gl_matrix_1.vec3.fromValues(0, 0, -1));
             }
             else if (this.cameraMode === CameraMode.Cockpit) {
-                this.proj = gl_matrix_1.mat4.perspective(gl_matrix_1.mat4.create(), gl_matrix_1.glMatrix.toRadian(60), 1, 1, 1000);
+                this.proj = perspectiveCamera;
                 const nodes = this.scenegraph.getNodes();
                 const planeNode = nodes.get("plane");
-                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 0, -8), gl_matrix_1.vec3.fromValues(0, 0, -100), gl_matrix_1.vec3.fromValues(0, 1, 0));
+                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 0, -2), gl_matrix_1.vec3.fromValues(0, 0, -100), gl_matrix_1.vec3.fromValues(0, 1, 0));
                 const planeTransformation = planeNode.getAnimationTransform();
-                gl_matrix_1.mat4.translate(planeTransformation, planeTransformation, gl_matrix_1.vec3.fromValues(0, 0, 0));
                 let planeInverse = gl_matrix_1.mat4.create();
                 gl_matrix_1.mat4.invert(planeInverse, planeTransformation);
                 gl_matrix_1.mat4.multiply(this.modelview.peek(), this.modelview.peek(), planeInverse);
             }
             else {
-                this.proj = gl_matrix_1.mat4.perspective(gl_matrix_1.mat4.create(), gl_matrix_1.glMatrix.toRadian(60), 1, 1, 1000);
+                this.proj = perspectiveCamera;
                 gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(130 * Math.cos(this.time / 50) + 70, 90, 130 * Math.sin(this.time / 50) - 10), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
             }
             this.gl.uniformMatrix4fv(this.shaderLocations.getUniformLocation("proj"), false, this.proj);

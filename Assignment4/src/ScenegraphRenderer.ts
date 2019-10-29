@@ -33,6 +33,8 @@ export class ScenegraphRenderer {
    */
   protected meshRenderers: Map<String, RenderableMesh<IVertexData>>;
 
+  private keyframeBuffers: Map<string, WebGLBuffer>;
+
   public constructor(
     gl: WebGLRenderingContext,
     shaderLocations: ShaderLocationsVault,
@@ -42,6 +44,7 @@ export class ScenegraphRenderer {
     this.shaderVarsToVertexAttribs = shaderVarsToAttribs;
     this.meshRenderers = new Map<String, RenderableMesh<IVertexData>>();
     this.shaderLocations = shaderLocations;
+    this.keyframeBuffers = new Map<string, number>();
   }
 
   /**
@@ -138,7 +141,7 @@ export class ScenegraphRenderer {
     }
   }
 
-  public drawKeyframe(vertices: number[][], transform: mat4) {
+  private bufferKeyframes(keyframe: string, vertices: number[][]) {
     const vbo = this.gl.createBuffer();
     const points = [];
     vertices.forEach(v => {
@@ -146,7 +149,16 @@ export class ScenegraphRenderer {
       points.push(v[1]);
       points.push(v[2]);
     });
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbo);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(points),
+      this.gl.STATIC_DRAW
+    );
+    this.keyframeBuffers.set(keyframe, vbo);
+  }
 
+  public drawKeyframe(keyframe: string, vertices: number[][], transform: mat4) {
     let loc: WebGLUniformLocation = this.shaderLocations.getUniformLocation(
       "vColor"
     );
@@ -155,13 +167,11 @@ export class ScenegraphRenderer {
     this.gl.uniform4fv(loc, color);
     loc = this.shaderLocations.getUniformLocation("modelview");
     this.gl.uniformMatrix4fv(loc, false, transform);
-
+    if (!this.keyframeBuffers.has(keyframe)) {
+      this.bufferKeyframes(keyframe, vertices);
+    }
+    const vbo = this.keyframeBuffers.get(keyframe);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbo);
-    this.gl.bufferData(
-      this.gl.ARRAY_BUFFER,
-      new Float32Array(points),
-      this.gl.STATIC_DRAW
-    );
     const positionLocation = this.shaderLocations.getAttribLocation(
       "vPosition"
     );
