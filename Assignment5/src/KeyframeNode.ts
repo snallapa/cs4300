@@ -114,7 +114,9 @@ export class KeyframeNode extends SGNode {
 
   public draw(context: ScenegraphRenderer, modelView: Stack<mat4>) {
     modelView.push(mat4.clone(modelView.peek()));
-
+    if (this.showLines) {
+      context.drawKeyframe(this.keyframeFile, this.keyFrames, modelView.peek());
+    }
     const frame = this.keyFrames[this.time];
     if (frame) {
       const nextFrame = this.keyFrames[(this.time + 1) % this.keyFrames.length];

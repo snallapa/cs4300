@@ -17011,6 +17011,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
          */
         draw(context, modelView) {
             modelView.push(gl_matrix_1.mat4.clone(modelView.peek()));
+            if (this.showLines) {
+                context.drawKeyframe(this.keyframeFile, this.keyFrames, modelView.peek());
+            }
             const frame = this.keyFrames[this.time];
             if (frame) {
                 const nextFrame = this.keyFrames[(this.time + 1) % this.keyFrames.length];
@@ -17661,7 +17664,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! %COMMON/RenderableMesh */ "../common/RenderableMesh.ts"), __webpack_require__(/*! %COMMON/WebGLUtils */ "../common/WebGLUtils.ts"), __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/esm/index.js")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, RenderableMesh_1, WebGLUtils, gl_matrix_1) {
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! %COMMON/RenderableMesh */ "../common/RenderableMesh.ts"), __webpack_require__(/*! %COMMON/WebGLUtils */ "../common/WebGLUtils.ts"), __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/esm/index.js"), __webpack_require__(/*! %COMMON/Material */ "../common/Material.ts")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, RenderableMesh_1, WebGLUtils, gl_matrix_1, Material_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -17759,11 +17762,15 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.keyframeBuffers.set(keyframe, vbo);
         }
         drawKeyframe(keyframe, vertices, transform) {
-            let loc = this.shaderLocations.getUniformLocation("vColor");
-            //set the color for all vertices to be drawn for this object
-            let color = gl_matrix_1.vec4.fromValues(1, 1, 0, 1);
-            this.gl.uniform4fv(loc, color);
-            loc = this.shaderLocations.getUniformLocation("modelview");
+            const material = new Material_1.Material();
+            material.setAmbient([1.0, 1.0, 0]);
+            material.setDiffuse([0, 0, 0]);
+            material.setSpecular([0, 0, 0]);
+            material.setShininess(1);
+            this.gl.uniform3fv(this.shaderLocations.getUniformLocation("material.ambient"), material.getAmbient());
+            this.gl.uniform3fv(this.shaderLocations.getUniformLocation("material.specular"), material.getSpecular());
+            this.gl.uniform1f(this.shaderLocations.getUniformLocation("material.shininess"), material.getShininess());
+            let loc = this.shaderLocations.getUniformLocation("modelview");
             this.gl.uniformMatrix4fv(loc, false, transform);
             if (!this.keyframeBuffers.has(keyframe)) {
                 this.bufferKeyframes(keyframe, vertices);
@@ -17774,8 +17781,13 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             //tell webgl that the position attribute can be found as 2-floats-per-vertex with a gap of 20 bytes
             //(2 floats per position, 3 floats per color = 5 floats = 20 bytes
             this.gl.vertexAttribPointer(positionLocation, 3, this.gl.FLOAT, false, 0, 0);
+            const normal = this.shaderLocations.getAttribLocation("vNormal");
+            //tell webgl that the position attribute can be found as 2-floats-per-vertex with a gap of 20 bytes
+            //(2 floats per position, 3 floats per color = 5 floats = 20 bytes
+            this.gl.vertexAttribPointer(normal, 3, this.gl.FLOAT, false, 0, 0);
             //tell webgl to enable this vertex attribute array, so that when it draws it will use this
             this.gl.enableVertexAttribArray(positionLocation);
+            this.gl.enableVertexAttribArray(normal);
             this.gl.drawArrays(this.gl.LINE_LOOP, 0, vertices.length);
         }
     }

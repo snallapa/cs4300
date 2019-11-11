@@ -175,17 +175,32 @@ export class ScenegraphRenderer {
   }
 
   public drawKeyframe(keyframe: string, vertices: number[][], transform: mat4) {
-    let loc: WebGLUniformLocation = this.shaderLocations.getUniformLocation(
-      "vColor"
+    const material = new Material();
+    material.setAmbient([1.0, 1.0, 0]);
+    material.setDiffuse([0, 0, 0]);
+    material.setSpecular([0, 0, 0]);
+    material.setShininess(1);
+
+    this.gl.uniform3fv(
+      this.shaderLocations.getUniformLocation("material.ambient"),
+      material.getAmbient()
     );
-    //set the color for all vertices to be drawn for this object
-    let color: vec4 = vec4.fromValues(1, 1, 0, 1);
-    this.gl.uniform4fv(loc, color);
-    loc = this.shaderLocations.getUniformLocation("modelview");
+
+    this.gl.uniform3fv(
+      this.shaderLocations.getUniformLocation("material.specular"),
+      material.getSpecular()
+    );
+    this.gl.uniform1f(
+      this.shaderLocations.getUniformLocation("material.shininess"),
+      material.getShininess()
+    );
+
+    let loc = this.shaderLocations.getUniformLocation("modelview");
     this.gl.uniformMatrix4fv(loc, false, transform);
     if (!this.keyframeBuffers.has(keyframe)) {
       this.bufferKeyframes(keyframe, vertices);
     }
+
     const vbo = this.keyframeBuffers.get(keyframe);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbo);
     const positionLocation = this.shaderLocations.getAttribLocation(
@@ -201,8 +216,14 @@ export class ScenegraphRenderer {
       0,
       0
     );
+
+    const normal = this.shaderLocations.getAttribLocation("vNormal");
+    //tell webgl that the position attribute can be found as 2-floats-per-vertex with a gap of 20 bytes
+    //(2 floats per position, 3 floats per color = 5 floats = 20 bytes
+    this.gl.vertexAttribPointer(normal, 3, this.gl.FLOAT, false, 0, 0);
     //tell webgl to enable this vertex attribute array, so that when it draws it will use this
     this.gl.enableVertexAttribArray(positionLocation);
+    this.gl.enableVertexAttribArray(normal);
     this.gl.drawArrays(this.gl.LINE_LOOP, 0, vertices.length);
   }
 }
