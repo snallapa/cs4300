@@ -26,6 +26,8 @@ export class LeafNode extends SGNode {
 
   protected textureName: string;
 
+  protected textureMatrix: mat4;
+
   public constructor(
     instanceOf: string,
     graph: Scenegraph<IVertexData>,
@@ -48,6 +50,10 @@ export class LeafNode extends SGNode {
    */
   public setTextureName(name: string): void {
     this.textureName = name;
+  }
+
+  public setTextureMatrix(textureMatrix: mat4): void {
+    this.textureMatrix = textureMatrix;
   }
 
   /*
@@ -83,7 +89,8 @@ export class LeafNode extends SGNode {
         this.meshName,
         this.material,
         this.textureName,
-        modelView.peek()
+        modelView.peek(),
+        this.textureMatrix
       );
     }
   }

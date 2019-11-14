@@ -116,7 +116,8 @@ export class ScenegraphRenderer {
     meshName: string,
     material: Material,
     textureName: string,
-    transformation: mat4
+    transformation: mat4,
+    textureMatrix: mat4
   ) {
     if (this.meshRenderers.has(meshName)) {
       //get the color
@@ -151,16 +152,18 @@ export class ScenegraphRenderer {
         this.shaderLocations.getUniformLocation("material.shininess"),
         material.getShininess()
       );
+      this.gl.activeTexture(this.gl.TEXTURE0);
+      this.gl.uniform1i(this.shaderLocations.getUniformLocation("image"), 0);
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures.get(textureName));
       this.gl.texParameteri(
         this.gl.TEXTURE_2D,
         this.gl.TEXTURE_MIN_FILTER,
-        this.gl.LINEAR_MIPMAP_LINEAR
+        this.gl.NEAREST_MIPMAP_LINEAR
       );
       this.gl.texParameteri(
         this.gl.TEXTURE_2D,
         this.gl.TEXTURE_MAG_FILTER,
-        this.gl.LINEAR_MIPMAP_LINEAR
+        this.gl.NEAREST
       );
 
       this.gl.texParameteri(
@@ -173,6 +176,12 @@ export class ScenegraphRenderer {
         this.gl.TEXTURE_2D,
         this.gl.TEXTURE_WRAP_T,
         this.gl.REPEAT
+      );
+
+      this.gl.uniformMatrix4fv(
+        this.shaderLocations.getUniformLocation("texturematrix"),
+        false,
+        textureMatrix
       );
 
       this.meshRenderers.get(meshName).draw(this.shaderLocations);

@@ -304,6 +304,49 @@ export namespace ScenegraphJSONImporter {
     } else {
       result.setTextureName("white");
     }
+    const transform: mat4 = mat4.create();
+    if ("texturetransform" in obj) {
+      for (let op of Object(obj["texturetransform"])) {
+        if ("translate" in op) {
+          let values: number[] = convertToArray(op["translate"]);
+          if (values.length != 3) {
+            throw new Error("3 values needed for translate");
+          }
+          let translateBy: vec3 = vec3.fromValues(
+            values[0],
+            values[1],
+            values[2]
+          );
+          mat4.translate(transform, transform, translateBy);
+        } else if ("scale" in op) {
+          let values: number[] = convertToArray(op["scale"]);
+          if (values.length != 3) {
+            throw new Error("3 values needed for scale");
+          }
+          let scaleBy: vec3 = vec3.fromValues(values[0], values[1], values[2]);
+          mat4.scale(transform, transform, scaleBy);
+        } else if ("rotate" in op) {
+          let values: number[] = convertToArray(op["rotate"]);
+          if (values.length != 4) {
+            throw new Error("4 values needed for rotate");
+          }
+          let rotateAngle: number = values[0];
+          let rotateAxis: vec3 = vec3.fromValues(
+            values[1],
+            values[2],
+            values[3]
+          );
+          mat4.rotate(
+            transform,
+            transform,
+            glMatrix.toRadian(rotateAngle),
+            rotateAxis
+          );
+        }
+      }
+    }
+
+    result.setTextureMatrix(transform);
     return result;
   }
 

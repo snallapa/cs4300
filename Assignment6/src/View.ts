@@ -143,8 +143,13 @@ export class View {
       ],
       "images": [{
         "name" : "brick",
-        "path" : "textures/checkerboard-box.png"
-      }],
+        "path" : "textures/brickbetter.png"
+      },
+      {
+        "name" : "roof",
+        "path" : "textures/roof.jpg"
+      }
+    ],
       "root": {
         "type": "group",
         "name": "Root of scene graph",
@@ -217,8 +222,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -252,6 +258,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [3,0.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -285,6 +293,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -317,7 +327,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -351,6 +363,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [3,0.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -384,6 +398,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -416,7 +432,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [2.5,1.5,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -450,6 +468,7 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "box", "texture": "brick",
+              "texturetransform" : [{"scale": [2.5,2,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -482,7 +501,8 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -516,6 +536,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [4.5,2,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -549,6 +571,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [4.5,4,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -582,6 +606,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -615,6 +641,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texture": "brick",
+              "texturetransform" : [{"scale": [2,2.5,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -648,6 +676,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texturetransform" : [{"scale": [0.8,0.6,1]}],
+              "texture": "roof",
               "material": {
                 "ambient": [
                   1,
@@ -681,6 +711,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [2,2.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -714,6 +746,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texturetransform" : [{"scale": [0.8,0.6,1]}],
+              "texture": "roof",
               "material": {
                 "ambient": [
                   1,
@@ -747,6 +781,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [2,2.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -780,6 +816,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texturetransform" : [{"scale": [0.8,0.6,1]}],
+              "texture": "roof",
               "material": {
                 "ambient": [
                   1,
@@ -813,6 +851,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [2,2.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -846,6 +886,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texturetransform" : [{"scale": [0.8,0.6,1]}],
+              "texture": "roof",
               "material": {
                 "ambient": [
                   1,
@@ -878,7 +920,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [1,3.9,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -911,7 +955,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [1.8,1.4,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -944,7 +990,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -978,6 +1026,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texture": "brick",
+              "texturetransform" : [{"scale": [4,1.5,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1011,6 +1061,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texturetransform" : [{"scale": [2,1,1]}],
+              "texture": "roof",
               "material": {
                 "ambient": [
                   1,
@@ -1076,7 +1128,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [3,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1109,7 +1163,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [1.5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1142,7 +1198,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1176,6 +1234,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [3,0.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -1209,6 +1269,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1241,7 +1303,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1275,6 +1339,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [3,0.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -1308,6 +1374,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1341,6 +1409,7 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "box", "texture": "brick",
+              "texturetransform" : [{"scale": [3,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1373,7 +1442,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1407,6 +1478,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [3,0.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -1440,6 +1513,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1472,7 +1547,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1506,6 +1583,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [3,0.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -1539,6 +1618,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1571,7 +1652,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [0.8,2.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1604,7 +1687,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [0.9,1.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1638,6 +1723,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [4.5,3.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -1671,6 +1758,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texturetransform" : [{"scale": [2,2,1]}],
+              "texture": "roof",
               "material": {
                 "ambient": [
                   1,
@@ -1703,7 +1792,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [0.9,1.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1736,7 +1827,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1770,6 +1863,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [3,0.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -1803,6 +1898,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1835,7 +1932,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [5,1,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1869,6 +1968,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cylinder",
+              "texturetransform" : [{"scale": [3,0.5,1]}],
+              "texture": "brick",
               "material": {
                 "ambient": [
                   1,
@@ -1902,6 +2003,8 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "cone",
+              "texture": "roof",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1934,7 +2037,9 @@ export class View {
             ],
             "child": {
               "type": "object",
-              "instanceof": "box", "texture": "brick",
+              "instanceof": "box", 
+              "texture": "brick",
+              "texturetransform" : [{"scale": [1.2,0.8,1]}],
               "material": {
                 "ambient": [
                   1,
@@ -1968,6 +2073,7 @@ export class View {
             "child": {
               "type": "object",
               "instanceof": "box",
+              "texture" : "brick",
               "material": {
                 "ambient": [
                   1,
@@ -2110,8 +2216,6 @@ export class View {
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.gl.enable(this.gl.DEPTH_TEST);
-
-    this.gl.activeTexture(this.gl.TEXTURE0);
 
     if (this.scenegraph == null) {
       return;
@@ -2265,6 +2369,7 @@ export class View {
         uniform mat4 projection;
         uniform mat4 modelview;
         uniform mat4 normalmatrix;
+        uniform mat4 texturematrix;
         varying vec3 fNormal;
         varying vec4 fPosition;
         varying vec4 fTexCoord;
@@ -2282,7 +2387,7 @@ export class View {
             vec4 tNormal = normalmatrix * vNormal;
             fNormal = normalize(tNormal.xyz);
 
-            fTexCoord = vec4(vTexCoord.s,vTexCoord.t,0,1);
+            fTexCoord = texturematrix * vec4(vTexCoord.s,vTexCoord.t,0,1);
         
         
         }
