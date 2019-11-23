@@ -1,0 +1,27 @@
+{
+    "name": "raytracerstart",
+    "version": "1.0.0",
+    "description": "This program shows how to programmatically fill a canvas and save it to a file",
+    "main": "RaytracerStart.js",
+    "directories": {
+        "doc": "docs"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/gl-matrix": "^2.4.5",
+        "gl-matrix": "^3.1.0",
+        "http-server": "^0.11.1",
+        "ts-loader": "^6.2.1",
+        "webgl-obj-loader": "^2.0.6",
+        "webpack": "^4.41.2",
+        "webpack-cli": "^3.3.10"
+    },
+    "devDependencies": {
+        "typescript": "^3.7.2"
+    }
+}
