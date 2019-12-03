@@ -4,7 +4,7 @@ import { Scenegraph } from "./Scenegraph";
 import { VertexPNT, VertexPNTProducer } from "./VertexPNT";
 import { ScenegraphRenderer } from "./ScenegraphRenderer";
 import { ScenegraphJSONImporter } from "./ScenegraphJSONImporter";
-import { sphere, cone, hogwartsOfficial, box } from "./Scene";
+import { sphere, cone, cylinder, hogwartsOfficial, box } from "./Scene";
 import { Stack } from "%COMMON/Stack";
 import { mat4, vec3, vec4, glMatrix, mat3 } from "gl-matrix";
 import { Material } from "%COMMON/Material";
@@ -35,7 +35,7 @@ export class RTView {
   }
 
   public initScenegraph(): void {
-    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), sphere()).then(
+    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), cone()).then(
       (s: Scenegraph<VertexPNT>) => {
         this.scenegraph = s;
         const textureMap = this.scenegraph.getTextures();
@@ -320,7 +320,7 @@ export class RTView {
     // );
     mat4.lookAt(
       this.modelview.peek(),
-      vec3.fromValues(0, 15, -50),
+      vec3.fromValues(0, 20, -50),
       vec3.fromValues(0, 0, 0),
       vec3.fromValues(0, 1, 0)
     );

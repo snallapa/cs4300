@@ -362,6 +362,10 @@ export class LeafNode extends SGNode {
           )
         )
       );
+      const objPoint = objRay.point(t);
+      const q = (objPoint[1] + 1)/2;
+      const u = Math.atan2(objPoint[2], objPoint[0]) / (2 * Math.PI) + 0.5;
+      hit.setTcoord(vec2.fromValues(u, q));
       hit.setNormal(normal);
       return hit;
     }
@@ -447,6 +451,10 @@ export class LeafNode extends SGNode {
         )
       );
       hit.setNormal(normal);
+      const objPoint = objRay.point(t);
+      const q = objPoint[1] * -1;
+      const u = Math.atan2(objPoint[2], objPoint[0]) / (2 * Math.PI) + 0.5;
+      hit.setTcoord(vec2.fromValues(u, q));
       return hit;
     }
 

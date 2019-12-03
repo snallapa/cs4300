@@ -17567,6 +17567,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 hit.setMaterial(this.material);
                 hit.setIntersection(r.point(hit.getT()));
                 const normal = gl_matrix_1.vec4.normalize(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.transformMat4(gl_matrix_1.vec4.create(), objNormal, gl_matrix_1.mat4.invert(gl_matrix_1.mat4.create(), gl_matrix_1.mat4.transpose(gl_matrix_1.mat4.create(), modelView.peek()))));
+                const objPoint = objRay.point(t);
+                const q = (objPoint[1] + 1) / 2;
+                const u = Math.atan2(objPoint[2], objPoint[0]) / (2 * Math.PI) + 0.5;
+                hit.setTcoord(gl_matrix_1.vec2.fromValues(u, q));
                 hit.setNormal(normal);
                 return hit;
             }
@@ -17626,6 +17630,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 hit.setIntersection(r.point(hit.getT()));
                 const normal = gl_matrix_1.vec4.normalize(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.transformMat4(gl_matrix_1.vec4.create(), objNormal, gl_matrix_1.mat4.invert(gl_matrix_1.mat4.create(), gl_matrix_1.mat4.transpose(gl_matrix_1.mat4.create(), modelView.peek()))));
                 hit.setNormal(normal);
+                const objPoint = objRay.point(t);
+                const q = objPoint[1] * -1;
+                const u = Math.atan2(objPoint[2], objPoint[0]) / (2 * Math.PI) + 0.5;
+                hit.setTcoord(gl_matrix_1.vec2.fromValues(u, q));
                 return hit;
             }
             return null;
@@ -17682,7 +17690,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.backgroundColor = gl_matrix_1.vec3.fromValues(0, 0, 0);
         }
         initScenegraph() {
-            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.sphere()).then((s) => {
+            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.cone()).then((s) => {
                 this.scenegraph = s;
                 const textureMap = this.scenegraph.getTextures();
                 const promises = [];
@@ -17819,7 +17827,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             //   vec3.fromValues(70, 30, -10),
             //   vec3.fromValues(0, 1, 0)
             // );
-            gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 15, -50), gl_matrix_1.vec3.fromValues(0, 0, 0), gl_matrix_1.vec3.fromValues(0, 1, 0));
+            gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 20, -50), gl_matrix_1.vec3.fromValues(0, 0, 0), gl_matrix_1.vec3.fromValues(0, 1, 0));
             this.raytrace(width, height, this.modelview);
         }
     }
@@ -20299,9 +20307,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 },
                 {
                   "scale": [
-                    30.0,
+                    100.0,
                     2.0,
-                    30.0
+                    100.0
                   ]
                 }
               ],
@@ -20334,8 +20342,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 0,
-                  "reflection": 1,
+                  "absorption": 0.5,
+                  "reflection": 0.5,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }
@@ -20466,12 +20474,16 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
           {
             "name": "box",
             "path": "models/box.obj"
+          },
+          {
+            "name": "sphere",
+            "path": "models/sphere.obj"
           }
         ],
         "images": [
           {
             "name": "checkerboard",
-            "path": "textures/checkerboard.png"
+            "path": "textures/brick.png"
           },
           {
             "name": "earth",
@@ -20500,14 +20512,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
               ],
               "position": [
                 0.0,
-                100.0,
                 0.0,
+                -20.0,
                 1.0
-              ],
-              "spotdirection": [
-                0.0,-1.0,0.0,0.0
-              ],
-              "spotcutoff": 20
+              ]
             }
 
           ],
@@ -20526,6 +20534,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
               "child": {
                 "type": "object",
                 "instanceof": "cylinder",
+                "texture": "checkerboard",
                 "material": {
                   "ambient": [
                     1,
@@ -20580,8 +20589,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         ],
         "images": [
           {
-            "name": "checkerboard",
-            "path": "textures/checkerboard.png"
+            "name": "roof",
+            "path": "textures/roof.jpg"
           },
           {
             "name": "earth",
@@ -20609,15 +20618,11 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 0.8
               ],
               "position": [
-                0.0,
-                100.0,
+                -10.0,
+                10.0,
                 0.0,
                 1.0
-              ],
-              "spotdirection": [
-                0.0,-1.0,0.0,0.0
-              ],
-              "spotcutoff": 20
+              ]
             }
 
           ],
@@ -20636,6 +20641,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
               "child": {
                 "type": "object",
                 "instanceof": "cone",
+                "texture":"roof",
                 "material": {
                   "ambient": [
                     1,
@@ -21583,7 +21589,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.shaderLocations = new ShaderLocationsVault_1.ShaderLocationsVault(this.gl, this.shaderProgram);
         }
         initScenegraph() {
-            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.sphere()).then((s) => {
+            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.cone()).then((s) => {
                 this.scenegraph = s;
                 this.initShaders(this.getPhongVShader(), this.getPhongFShader(this.scenegraph.getNumberLight()));
                 let shaderVarsToVertexAttribs = new Map();
@@ -21633,7 +21639,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 //   vec3.fromValues(70, 30, -10),
                 //   vec3.fromValues(0, 1, 0)
                 // );
-                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 0, -50), gl_matrix_1.vec3.fromValues(0, 0, 0), gl_matrix_1.vec3.fromValues(0, 1, 0));
+                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 20, -50), gl_matrix_1.vec3.fromValues(0, 0, 0), gl_matrix_1.vec3.fromValues(0, 1, 0));
             }
             else if (this.cameraMode === CameraMode.Overhead) {
                 this.proj = orthoCamera;

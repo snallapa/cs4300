@@ -2259,9 +2259,9 @@ export function sphere() {
                 },
                 {
                   "scale": [
-                    30.0,
+                    100.0,
                     2.0,
-                    30.0
+                    100.0
                   ]
                 }
               ],
@@ -2294,8 +2294,8 @@ export function sphere() {
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 0,
-                  "reflection": 1,
+                  "absorption": 0.5,
+                  "reflection": 0.5,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }
@@ -2426,12 +2426,16 @@ export function cylinder() {
           {
             "name": "box",
             "path": "models/box.obj"
+          },
+          {
+            "name": "sphere",
+            "path": "models/sphere.obj"
           }
         ],
         "images": [
           {
             "name": "checkerboard",
-            "path": "textures/checkerboard.png"
+            "path": "textures/brick.png"
           },
           {
             "name": "earth",
@@ -2460,14 +2464,10 @@ export function cylinder() {
               ],
               "position": [
                 0.0,
-                100.0,
                 0.0,
+                -20.0,
                 1.0
-              ],
-              "spotdirection": [
-                0.0,-1.0,0.0,0.0
-              ],
-              "spotcutoff": 20
+              ]
             }
 
           ],
@@ -2486,6 +2486,7 @@ export function cylinder() {
               "child": {
                 "type": "object",
                 "instanceof": "cylinder",
+                "texture": "checkerboard",
                 "material": {
                   "ambient": [
                     1,
@@ -2540,8 +2541,8 @@ export function cone() {
         ],
         "images": [
           {
-            "name": "checkerboard",
-            "path": "textures/checkerboard.png"
+            "name": "roof",
+            "path": "textures/roof.jpg"
           },
           {
             "name": "earth",
@@ -2569,15 +2570,11 @@ export function cone() {
                 0.8
               ],
               "position": [
-                0.0,
-                100.0,
+                -10.0,
+                10.0,
                 0.0,
                 1.0
-              ],
-              "spotdirection": [
-                0.0,-1.0,0.0,0.0
-              ],
-              "spotcutoff": 20
+              ]
             }
 
           ],
@@ -2596,6 +2593,7 @@ export function cone() {
               "child": {
                 "type": "object",
                 "instanceof": "cone",
+                "texture":"roof",
                 "material": {
                   "ambient": [
                     1,
