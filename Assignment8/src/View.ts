@@ -8,7 +8,7 @@ import { ShaderLocationsVault } from "%COMMON/ShaderLocationsVault";
 import { ScenegraphRenderer } from "./ScenegraphRenderer";
 import { ScenegraphJSONImporter } from "./ScenegraphJSONImporter";
 import { KeyframeNode } from "KeyframeNode";
-import { cone, sphere } from "./Scene";
+import { cone, sphere, box } from "./Scene";
 
 /**
  * This class encapsulates the "view", where all of our WebGL code resides. This class, for now, also stores all the relevant data that is used to draw. This can be replaced with a more formal Model-View-Controller architecture with a bigger application.
@@ -79,7 +79,7 @@ export class View {
   }
 
   public initScenegraph(): void {
-    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), cone()).then(
+    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), sphere()).then(
       (s: Scenegraph<VertexPNT>) => {
         this.scenegraph = s;
 
@@ -156,18 +156,18 @@ export class View {
 
     if (this.cameraMode === CameraMode.Front) {
       this.proj = perspectiveCamera;
-      mat4.lookAt(
-        this.modelview.peek(),
-        vec3.fromValues(100, 100, 120),
-        vec3.fromValues(70, 30, -10),
-        vec3.fromValues(0, 1, 0)
-      );
       // mat4.lookAt(
       //   this.modelview.peek(),
-      //   vec3.fromValues(0, 0, -10),
-      //   vec3.fromValues(0, 0, 0),
+      //   vec3.fromValues(100, 100, 120),
+      //   vec3.fromValues(70, 30, -10),
       //   vec3.fromValues(0, 1, 0)
       // );
+      mat4.lookAt(
+        this.modelview.peek(),
+        vec3.fromValues(0, 0, -50),
+        vec3.fromValues(0, 0, 0),
+        vec3.fromValues(0, 1, 0)
+      );
     } else if (this.cameraMode === CameraMode.Overhead) {
       this.proj = orthoCamera;
       mat4.lookAt(

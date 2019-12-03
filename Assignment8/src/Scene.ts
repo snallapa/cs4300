@@ -2096,13 +2096,13 @@ export function sphere() {
           },
           {
             "name": "box",
-            "path": "models/box.obj"
+            "path": "models/box-outside.obj"
           }
         ],
         "images": [
           {
             "name": "checkerboard",
-            "path": "textures/checkerboard.png"
+            "path": "textures/checkerboard-box.png"
           },
           {
             "name": "earth",
@@ -2131,14 +2131,10 @@ export function sphere() {
               ],
               "position": [
                 0.0,
-                100.0,
+                40.0,
                 0.0,
                 1.0
-              ],
-              "spotdirection": [
-                0.0,-1.0,0.0,0.0
-              ],
-              "spotcutoff": 20
+              ]
             }
 
           ],
@@ -2147,10 +2143,17 @@ export function sphere() {
               "type": "transform",
               "transform": [
                 {
+                  "translate": [
+                    -15,
+                    0,
+                    0
+                  ]
+                },
+                {
                   "scale": [
-                    10.0,
-                    10.0,
-                    10.0
+                    10,
+                    10,
+                    10
                   ]
                 }
               ],
@@ -2183,8 +2186,116 @@ export function sphere() {
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 1.0,
-                  "reflection": 0.0,
+                  "absorption": 0.1,
+                  "reflection": 0.9,
+                  "transparency": 0.0,
+                  "refractive_index": 0.0
+                }
+              }
+            },
+            {
+              "type": "transform",
+              "transform": [
+                {
+                  "translate": [
+                    15,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "scale": [
+                    10,
+                    10,
+                    10
+                  ]
+                }
+              ],
+              "child": {
+                "type": "object",
+                "instanceof": "sphere",
+                "material": {
+                  "ambient": [
+                    1,
+                    1,
+                    1,
+                    1.0
+                  ],
+                  "diffuse": [
+                    0.8,
+                    0.8,
+                    0.8,
+                    1.0
+                  ],
+                  "specular": [
+                    0.8,
+                    0.8,
+                    0.8,
+                    1.0
+                  ],
+                  "emission": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "shininess": 1.0,
+                  "absorption": 0.2,
+                  "reflection": 0.8,
+                  "transparency": 0.0,
+                  "refractive_index": 0.0
+                }
+              }
+            },
+            {
+              "type": "transform",
+              "transform": [
+                {
+                  "translate": [
+                    0,
+                    -15,
+                    0
+                  ]
+                },
+                {
+                  "scale": [
+                    30.0,
+                    2.0,
+                    30.0
+                  ]
+                }
+              ],
+              "child": {
+                "type": "object",
+                "instanceof": "box",
+                "material": {
+                  "ambient": [
+                    1,
+                    1,
+                    1,
+                    1.0
+                  ],
+                  "diffuse": [
+                    0.8,
+                    0.8,
+                    0.8,
+                    1.0
+                  ],
+                  "specular": [
+                    0.8,
+                    0.8,
+                    0.8,
+                    1.0
+                  ],
+                  "emission": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "shininess": 1.0,
+                  "absorption": 0,
+                  "reflection": 1,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }
@@ -2205,13 +2316,13 @@ export function box() {
           },
           {
             "name": "box",
-            "path": "models/box.obj"
+            "path": "models/box-outside.obj"
           }
         ],
         "images": [
           {
             "name": "checkerboard",
-            "path": "textures/checkerboard.png"
+            "path": "textures/checkerboard-box.png"
           },
           {
             "name": "earth",
@@ -2263,6 +2374,7 @@ export function box() {
               ],
               "child": {
                 "type": "object",
+                "texture": "checkerboard",
                 "instanceof": "box",
                 "material": {
                   "ambient": [
@@ -2487,8 +2599,8 @@ export function cone() {
                 "material": {
                   "ambient": [
                     1,
-                    0,
-                    0,
+                    1,
+                    1,
                     1.0
                   ],
                   "diffuse": [

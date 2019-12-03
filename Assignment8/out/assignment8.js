@@ -17401,26 +17401,60 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     hit.setIntersection(r.point(hit.getT()));
                     const objPoint = objRay.point(hit.getT());
                     let normalx = 0, normaly = 0, normalz = 0;
+                    let face = "top";
                     if (objPoint[0] === 0.5) {
                         normalx = 1;
+                        face = "right";
                     }
                     if (objPoint[0] === -0.5) {
                         normalx = -1;
+                        face = "left";
                     }
                     if (objPoint[1] === 0.5) {
                         normaly = 1;
+                        face = "top";
                     }
                     if (objPoint[1] === -0.5) {
                         normaly = -1;
+                        face = "bottom";
                     }
                     if (objPoint[2] === 0.5) {
                         normalz = 1;
+                        face = "front";
                     }
                     if (objPoint[2] === -0.5) {
                         normalz = -1;
+                        face = "back";
                     }
-                    console.log();
-                    const normal = gl_matrix_1.vec4.normalize(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.transformMat4(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.fromValues(normalx, normaly, normalz, 0), gl_matrix_1.mat4.invert(gl_matrix_1.mat4.create(), gl_matrix_1.mat4.transpose(gl_matrix_1.mat4.create(), modelView.peek()))));
+                    let u, v;
+                    switch (face) {
+                        case "top":
+                            u = 0.25 + (objPoint[0] + 0.5) / 4;
+                            v = 0.5 + (objPoint[2] + 0.5) / 4;
+                            break;
+                        case "bottom":
+                            u = 0.25 + (objPoint[0] + 0.5) / 4;
+                            v = (objPoint[2] + 0.5) / 4;
+                            break;
+                        case "left":
+                            u = (objPoint[2] + 0.5) / 4;
+                            v = 0.25 + (objPoint[1] + 0.5) / 4;
+                            break;
+                        case "right":
+                            u = 0.5 + (objPoint[2] + 0.5) / 4;
+                            v = 0.25 + (objPoint[1] + 0.5) / 4;
+                            break;
+                        case "front":
+                            u = 0.25 + (objPoint[0] + 0.5) / 4;
+                            v = 0.25 + (objPoint[1] + 0.5) / 4;
+                            break;
+                        case "back":
+                            u = 0.75 + (objPoint[0] + 0.5) / 4;
+                            v = 0.25 + (objPoint[1] + 0.5) / 4;
+                            break;
+                    }
+                    hit.setTcoord(gl_matrix_1.vec2.fromValues(u, v));
+                    const normal = gl_matrix_1.vec4.normalize(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.transformMat4(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.fromValues(normalx, normaly, normalz, 0), gl_matrix_1.mat4.transpose(gl_matrix_1.mat4.create(), gl_matrix_1.mat4.invert(gl_matrix_1.mat4.create(), modelView.peek()))));
                     hit.setNormal(normal);
                     return hit;
                 }
@@ -17457,7 +17491,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     hit.setMaterial(this.material);
                     hit.setIntersection(r.point(hit.getT()));
                     const objPoint = objRay.point(hit.getT());
-                    const normal = gl_matrix_1.vec4.normalize(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.transformMat4(gl_matrix_1.vec4.create(), objPoint, gl_matrix_1.mat4.invert(gl_matrix_1.mat4.create(), gl_matrix_1.mat4.transpose(gl_matrix_1.mat4.create(), modelView.peek()))));
+                    const normalV = gl_matrix_1.vec4.fromValues(objPoint[0], objPoint[1], objPoint[2], 0);
+                    const normal = gl_matrix_1.vec4.normalize(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.transformMat4(gl_matrix_1.vec4.create(), normalV, gl_matrix_1.mat4.invert(gl_matrix_1.mat4.create(), gl_matrix_1.mat4.transpose(gl_matrix_1.mat4.create(), modelView.peek()))));
+                    hit.setTcoord(gl_matrix_1.vec2.fromValues(Math.atan2(objPoint[0], objPoint[2]) / (2 * Math.PI) + 0.5, objPoint[1] * 0.5 + 0.5));
                     hit.setNormal(normal);
                     return hit;
                 }
@@ -17627,11 +17663,12 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! ./Ray */ "./src/Ray.ts"), __webpack_require__(/*! ./VertexPNT */ "./src/VertexPNT.ts"), __webpack_require__(/*! ./ScenegraphJSONImporter */ "./src/ScenegraphJSONImporter.ts"), __webpack_require__(/*! ./Scene */ "./src/Scene.ts"), __webpack_require__(/*! %COMMON/Stack */ "../common/Stack.ts"), __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/esm/index.js")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, Ray_1, VertexPNT_1, ScenegraphJSONImporter_1, Scene_1, Stack_1, gl_matrix_1) {
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! ./Ray */ "./src/Ray.ts"), __webpack_require__(/*! ./VertexPNT */ "./src/VertexPNT.ts"), __webpack_require__(/*! ./ScenegraphJSONImporter */ "./src/ScenegraphJSONImporter.ts"), __webpack_require__(/*! ./Scene */ "./src/Scene.ts"), __webpack_require__(/*! %COMMON/Stack */ "../common/Stack.ts"), __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/esm/index.js"), __webpack_require__(/*! ./RayTextureObject */ "./src/RayTextureObject.ts")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, Ray_1, VertexPNT_1, ScenegraphJSONImporter_1, Scene_1, Stack_1, gl_matrix_1, RayTextureObject_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class RTView {
         constructor() {
+            this.textures = new Map();
             this.canvas = document.querySelector("#raytraceCanvas");
             if (!this.canvas) {
                 console.log("Failed to retrieve the <canvas> element");
@@ -17641,11 +17678,24 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             let button = (document.querySelector("#savebutton"));
             button.addEventListener("click", ev => this.saveCanvas());
             this.modelview = new Stack_1.Stack();
+            // this.backgroundColor = vec3.fromValues(0.7, 0.7, 0.7);
+            this.backgroundColor = gl_matrix_1.vec3.fromValues(0, 0, 0);
         }
         initScenegraph() {
-            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.cone()).then((s) => {
+            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.sphere()).then((s) => {
                 this.scenegraph = s;
-                this.fillCanvas();
+                const textureMap = this.scenegraph.getTextures();
+                const promises = [];
+                for (const key of textureMap.keys()) {
+                    const name = key;
+                    const src = textureMap.get(key);
+                    let textureObject = new RayTextureObject_1.RayTextureObject(name, src);
+                    this.textures.set(name, textureObject);
+                    promises.push(textureObject.load());
+                }
+                Promise.all(promises).then(() => {
+                    this.fillCanvas();
+                });
             });
             //set it up
         }
@@ -17666,11 +17716,11 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     let color;
                     const hit = this.raycast(r, modelview);
                     if (!!hit) {
-                        color = this.shade(x, y, hit, modelview);
+                        color = this.shade(x, y, hit, modelview, r, 0);
                         // color = vec3.fromValues(1, 1, 1);
                     }
                     else {
-                        color = gl_matrix_1.vec3.fromValues(0, 0, 0);
+                        color = this.backgroundColor;
                     }
                     //set color
                     imageData.data[4 * ((height - y) * width + x)] = color[0] * 255;
@@ -17681,11 +17731,24 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             }
             this.canvas.getContext("2d").putImageData(imageData, 0, 0);
         }
-        shade(x, y, hit, modelview) {
+        shade(x, y, hit, modelview, ray, bounce) {
             const lights = this.scenegraph.getLights(modelview);
             let result = gl_matrix_1.vec3.fromValues(0, 0, 0);
             lights.forEach(light => {
                 const fPosition = gl_matrix_1.vec3.fromValues(hit.getIntersection()[0], hit.getIntersection()[1], hit.getIntersection()[2]);
+                const shadowDirection = gl_matrix_1.vec4.sub(gl_matrix_1.vec4.create(), light.getPosition(), hit.getIntersection());
+                let shadow = 1;
+                const shadowStart = gl_matrix_1.vec4.add(gl_matrix_1.vec4.create(), hit.getIntersection(), gl_matrix_1.vec4.scale(gl_matrix_1.vec4.create(), shadowDirection, 0.001));
+                const shadowRay = new Ray_1.Ray(shadowStart, shadowDirection);
+                const shadowHit = this.raycast(shadowRay, modelview);
+                if (!!shadowHit) {
+                    const tL = gl_matrix_1.vec4.div(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.sub(gl_matrix_1.vec4.create(), light.getPosition(), shadowRay.getStart()), shadowRay.getDirection());
+                    let possible = [tL[0], tL[1], tL[2]];
+                    possible = possible.filter(t => !isNaN(t));
+                    if (shadowHit.getT() < possible[0]) {
+                        shadow = 0;
+                    }
+                }
                 let lightVec;
                 if (light.getPosition()[3] != 0) {
                     lightVec = gl_matrix_1.vec3.normalize(gl_matrix_1.vec3.create(), gl_matrix_1.vec3.sub(gl_matrix_1.vec3.create(), gl_matrix_1.vec3.fromValues(light.getPosition()[0], light.getPosition()[1], light.getPosition()[2]), fPosition));
@@ -17712,7 +17775,34 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     gl_matrix_1.vec3.add(result, result, diffuse);
                     gl_matrix_1.vec3.add(result, result, specular);
                 }
+                gl_matrix_1.vec3.scale(result, result, shadow);
             });
+            const tCoord = hit.getTcoord();
+            const u = tCoord[0];
+            const v = tCoord[1];
+            const textureObject = this.textures.get(hit.getTexture());
+            const textureColor = textureObject.getColor(u, v);
+            gl_matrix_1.vec3.multiply(result, result, gl_matrix_1.vec3.fromValues(textureColor[0] / 255, textureColor[1] / 255, textureColor[2] / 255));
+            const material = hit.getMaterial();
+            if (material.getReflection() > 0) {
+                const normal = gl_matrix_1.vec4.normalize(gl_matrix_1.vec4.create(), gl_matrix_1.vec4.fromValues(hit.getNormal()[0], hit.getNormal()[1], hit.getNormal()[2], 0));
+                const twoDot = 2 * gl_matrix_1.vec4.dot(normal, ray.getDirection());
+                const reflectionDirection = gl_matrix_1.vec4.sub(gl_matrix_1.vec4.create(), ray.getDirection(), gl_matrix_1.vec4.scale(gl_matrix_1.vec4.create(), normal, twoDot));
+                const reflectionStart = gl_matrix_1.vec4.add(gl_matrix_1.vec4.create(), hit.getIntersection(), gl_matrix_1.vec4.scale(gl_matrix_1.vec4.create(), normal, 0.0001));
+                // const reflectionStart = hit.getIntersection();
+                const reflectionRay = new Ray_1.Ray(reflectionStart, reflectionDirection);
+                const reflectionHit = this.raycast(reflectionRay, modelview);
+                if (bounce < 10) {
+                    let reflectionColor;
+                    if (!!reflectionHit) {
+                        reflectionColor = this.shade(x, y, reflectionHit, modelview, reflectionRay, bounce + 1);
+                    }
+                    else {
+                        reflectionColor = this.backgroundColor;
+                    }
+                    return gl_matrix_1.vec3.add(gl_matrix_1.vec3.create(), gl_matrix_1.vec3.scale(gl_matrix_1.vec3.create(), result, material.getAbsorption()), gl_matrix_1.vec3.scale(gl_matrix_1.vec3.create(), reflectionColor, material.getReflection()));
+                }
+            }
             return result;
         }
         raycast(r, modelview) {
@@ -17723,13 +17813,13 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             let height = Number(this.canvas.getAttribute("height"));
             this.modelview.push(gl_matrix_1.mat4.create());
             this.modelview.push(gl_matrix_1.mat4.clone(this.modelview.peek()));
-            gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(100, 100, 120), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
             // mat4.lookAt(
             //   this.modelview.peek(),
-            //   vec3.fromValues(0, 0, -10),
-            //   vec3.fromValues(0, 0, 0),
+            //   vec3.fromValues(100, 100, 120),
+            //   vec3.fromValues(70, 30, -10),
             //   vec3.fromValues(0, 1, 0)
             // );
+            gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 15, -50), gl_matrix_1.vec3.fromValues(0, 0, 0), gl_matrix_1.vec3.fromValues(0, 1, 0));
             this.raytrace(width, height, this.modelview);
         }
     }
@@ -17769,6 +17859,85 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         }
     }
     exports.Ray = Ray;
+}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ }),
+
+/***/ "./src/RayTextureObject.ts":
+/*!*********************************!*\
+  !*** ./src/RayTextureObject.ts ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/esm/index.js")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, gl_matrix_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * This class represents a texture object. It contains not only the texture ID for WebGL, but also the raw pixel data that can be used to manually look up a color.
+     */
+    class RayTextureObject {
+        constructor(name, textureURL) {
+            this.name = name;
+            this.src = textureURL;
+        }
+        load() {
+            const image = new Image();
+            image.src = this.src;
+            return new Promise((resolve) => {
+                image.addEventListener("load", () => {
+                    //capture raw data
+                    let canvas = document.createElement("canvas");
+                    let context = canvas.getContext("2d");
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    context.drawImage(image, 0, 0);
+                    this.data = context.getImageData(0, 0, image.width, image.height).data;
+                    this.width = canvas.width;
+                    this.height = canvas.height;
+                    resolve();
+                });
+            });
+        }
+        getName() {
+            return this.name;
+        }
+        /**
+         * Get the color at the given location. The location is assumed to be a texture coordinate. When the location exceeds [0,1], we repeat the texture
+         * @param x the x coordinate of the location
+         * @param y the y coordinate of the location
+         */
+        getColor(x, y) {
+            let x1, y1, x2, y2;
+            x = x - Math.trunc(x); //REPEAT
+            y = y - Math.trunc(y); //REPEAT
+            x1 = Math.trunc(x * this.width);
+            y1 = Math.trunc(y * this.height);
+            x1 = (x1 + this.width) % this.width;
+            y1 = (y1 + this.height) % this.height;
+            x2 = x1 + 1;
+            y2 = y1 + 1;
+            if (x2 >= this.width)
+                x2 = this.width - 1;
+            if (y2 >= this.height)
+                y2 = this.height - 1;
+            let one = this.lookup(x1, y1);
+            let two = this.lookup(x2, y1);
+            let three = this.lookup(x1, y2);
+            let four = this.lookup(x2, y2);
+            let inter1, inter2, inter3;
+            inter1 = gl_matrix_1.vec4.lerp(gl_matrix_1.vec4.create(), one, three, y - Math.trunc(y));
+            inter2 = gl_matrix_1.vec4.lerp(gl_matrix_1.vec4.create(), two, four, y - Math.trunc(y));
+            inter3 = gl_matrix_1.vec4.lerp(gl_matrix_1.vec4.create(), inter1, inter2, x - Math.trunc(x));
+            return inter3;
+        }
+        lookup(x, y) {
+            return gl_matrix_1.vec4.fromValues(this.data[4 * (y * this.width + x)], this.data[4 * (y * this.width + x) + 1], this.data[4 * (y * this.width + x) + 2], this.data[4 * (y * this.width + x) + 3]);
+        }
+    }
+    exports.RayTextureObject = RayTextureObject;
 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
@@ -19967,13 +20136,13 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
           },
           {
             "name": "box",
-            "path": "models/box.obj"
+            "path": "models/box-outside.obj"
           }
         ],
         "images": [
           {
             "name": "checkerboard",
-            "path": "textures/checkerboard.png"
+            "path": "textures/checkerboard-box.png"
           },
           {
             "name": "earth",
@@ -20002,14 +20171,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
               ],
               "position": [
                 0.0,
-                100.0,
+                40.0,
                 0.0,
                 1.0
-              ],
-              "spotdirection": [
-                0.0,-1.0,0.0,0.0
-              ],
-              "spotcutoff": 20
+              ]
             }
 
           ],
@@ -20018,10 +20183,17 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
               "type": "transform",
               "transform": [
                 {
+                  "translate": [
+                    -15,
+                    0,
+                    0
+                  ]
+                },
+                {
                   "scale": [
-                    10.0,
-                    10.0,
-                    10.0
+                    10,
+                    10,
+                    10
                   ]
                 }
               ],
@@ -20054,8 +20226,116 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 1.0,
-                  "reflection": 0.0,
+                  "absorption": 0.1,
+                  "reflection": 0.9,
+                  "transparency": 0.0,
+                  "refractive_index": 0.0
+                }
+              }
+            },
+            {
+              "type": "transform",
+              "transform": [
+                {
+                  "translate": [
+                    15,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "scale": [
+                    10,
+                    10,
+                    10
+                  ]
+                }
+              ],
+              "child": {
+                "type": "object",
+                "instanceof": "sphere",
+                "material": {
+                  "ambient": [
+                    1,
+                    1,
+                    1,
+                    1.0
+                  ],
+                  "diffuse": [
+                    0.8,
+                    0.8,
+                    0.8,
+                    1.0
+                  ],
+                  "specular": [
+                    0.8,
+                    0.8,
+                    0.8,
+                    1.0
+                  ],
+                  "emission": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "shininess": 1.0,
+                  "absorption": 0.2,
+                  "reflection": 0.8,
+                  "transparency": 0.0,
+                  "refractive_index": 0.0
+                }
+              }
+            },
+            {
+              "type": "transform",
+              "transform": [
+                {
+                  "translate": [
+                    0,
+                    -15,
+                    0
+                  ]
+                },
+                {
+                  "scale": [
+                    30.0,
+                    2.0,
+                    30.0
+                  ]
+                }
+              ],
+              "child": {
+                "type": "object",
+                "instanceof": "box",
+                "material": {
+                  "ambient": [
+                    1,
+                    1,
+                    1,
+                    1.0
+                  ],
+                  "diffuse": [
+                    0.8,
+                    0.8,
+                    0.8,
+                    1.0
+                  ],
+                  "specular": [
+                    0.8,
+                    0.8,
+                    0.8,
+                    1.0
+                  ],
+                  "emission": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "shininess": 1.0,
+                  "absorption": 0,
+                  "reflection": 1,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }
@@ -20076,13 +20356,13 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
           },
           {
             "name": "box",
-            "path": "models/box.obj"
+            "path": "models/box-outside.obj"
           }
         ],
         "images": [
           {
             "name": "checkerboard",
-            "path": "textures/checkerboard.png"
+            "path": "textures/checkerboard-box.png"
           },
           {
             "name": "earth",
@@ -20134,6 +20414,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
               ],
               "child": {
                 "type": "object",
+                "texture": "checkerboard",
                 "instanceof": "box",
                 "material": {
                   "ambient": [
@@ -20358,8 +20639,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 "material": {
                   "ambient": [
                     1,
-                    0,
-                    0,
+                    1,
+                    1,
                     1.0
                   ],
                   "diffuse": [
@@ -20697,6 +20978,59 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             return result;
         }
         ScenegraphJSONImporter.convertToArray = convertToArray;
+        function handleMaterial(obj) {
+            let mat = new Material_1.Material();
+            if ("ambient" in obj) {
+                let values = convertToArray(obj["ambient"]);
+                if (values.length != 4) {
+                    throw new Error("4 values needed for ambient");
+                }
+                mat.setAmbient(values);
+            }
+            if ("diffuse" in obj) {
+                let values = convertToArray(obj["diffuse"]);
+                if (values.length != 4) {
+                    throw new Error("4 values needed for diffuse");
+                }
+                mat.setDiffuse(values);
+            }
+            if ("specular" in obj) {
+                let values = convertToArray(obj["specular"]);
+                if (values.length != 4) {
+                    throw new Error("4 values needed for specular");
+                }
+                mat.setSpecular(values);
+            }
+            if ("emissive" in obj) {
+                let values = convertToArray(obj["emissive"]);
+                if (values.length != 4) {
+                    throw new Error("4 values needed for emissive");
+                }
+                mat.setEmission(values);
+            }
+            if ("shininess" in obj) {
+                let value = parseFloat(obj["shininess"]);
+                mat.setShininess(value);
+            }
+            if ("absorption" in obj) {
+                let value = parseFloat(obj["absorption"]);
+                mat.setAbsorption(value);
+            }
+            if ("reflection" in obj) {
+                let value = parseFloat(obj["reflection"]);
+                mat.setReflection(value);
+            }
+            if ("transparency" in obj) {
+                let value = parseFloat(obj["transparency"]);
+                mat.setTransparency(value);
+            }
+            if ("refractive_index" in obj) {
+                let value = parseFloat(obj["refractive_index"]);
+                mat.setRefractiveIndex(value);
+            }
+            return mat;
+        }
+        ScenegraphJSONImporter.handleMaterial = handleMaterial;
         function handleGroupNode(scenegraph, obj) {
             let result;
             let nodeName = "g";
@@ -20720,33 +21054,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             let material = new Material_1.Material(); //all black by default
             result = new LeafNode_1.LeafNode(obj["instanceof"], scenegraph, nodeName);
             if ("material" in obj) {
-                if ("color" in obj["material"]) {
-                    material.setAmbient([
-                        obj["material"]["color"][0],
-                        obj["material"]["color"][1],
-                        obj["material"]["color"][2]
-                    ]);
-                }
-                else {
-                    material.setAmbient([
-                        obj["material"]["ambient"][0],
-                        obj["material"]["ambient"][1],
-                        obj["material"]["ambient"][2]
-                    ]);
-                    material.setDiffuse([
-                        obj["material"]["diffuse"][0],
-                        obj["material"]["diffuse"][1],
-                        obj["material"]["diffuse"][2]
-                    ]);
-                    material.setSpecular([
-                        obj["material"]["specular"][0],
-                        obj["material"]["specular"][1],
-                        obj["material"]["specular"][2]
-                    ]);
-                    material.setShininess(obj["material"]["shininess"]);
-                }
-                result.setMaterial(material);
+                material = handleMaterial(obj["material"]);
             }
+            result.setMaterial(material);
             if ("texture" in obj) {
                 result.setTextureName(obj["texture"]);
             }
@@ -21273,7 +21583,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.shaderLocations = new ShaderLocationsVault_1.ShaderLocationsVault(this.gl, this.shaderProgram);
         }
         initScenegraph() {
-            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.cone()).then((s) => {
+            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.sphere()).then((s) => {
                 this.scenegraph = s;
                 this.initShaders(this.getPhongVShader(), this.getPhongFShader(this.scenegraph.getNumberLight()));
                 let shaderVarsToVertexAttribs = new Map();
@@ -21317,13 +21627,13 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.modelview.push(gl_matrix_1.mat4.clone(this.modelview.peek()));
             if (this.cameraMode === CameraMode.Front) {
                 this.proj = perspectiveCamera;
-                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(100, 100, 120), gl_matrix_1.vec3.fromValues(70, 30, -10), gl_matrix_1.vec3.fromValues(0, 1, 0));
                 // mat4.lookAt(
                 //   this.modelview.peek(),
-                //   vec3.fromValues(0, 0, -10),
-                //   vec3.fromValues(0, 0, 0),
+                //   vec3.fromValues(100, 100, 120),
+                //   vec3.fromValues(70, 30, -10),
                 //   vec3.fromValues(0, 1, 0)
                 // );
+                gl_matrix_1.mat4.lookAt(this.modelview.peek(), gl_matrix_1.vec3.fromValues(0, 0, -50), gl_matrix_1.vec3.fromValues(0, 0, 0), gl_matrix_1.vec3.fromValues(0, 1, 0));
             }
             else if (this.cameraMode === CameraMode.Overhead) {
                 this.proj = orthoCamera;

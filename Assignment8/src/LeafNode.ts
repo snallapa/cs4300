@@ -3,7 +3,7 @@ import { Scenegraph } from "./Scenegraph";
 import { Material } from "%COMMON/Material";
 import { Stack } from "%COMMON/Stack";
 import { ScenegraphRenderer } from "./ScenegraphRenderer";
-import { mat4, vec4, vec3 } from "gl-matrix";
+import { mat4, vec4, vec2, vec3 } from "gl-matrix";
 import { IVertexData } from "%COMMON/IVertexData";
 import { Light } from "%COMMON/Light";
 import { Ray } from "Ray";
@@ -138,36 +138,72 @@ export class LeafNode extends SGNode {
         let normalx: number = 0,
           normaly: number = 0,
           normalz: number = 0;
+        let face = "top";
         if (objPoint[0] === 0.5) {
           normalx = 1;
+          face = "right";
         }
         if (objPoint[0] === -0.5) {
           normalx = -1;
+          face = "left";
         }
         if (objPoint[1] === 0.5) {
           normaly = 1;
+          face = "top";
         }
         if (objPoint[1] === -0.5) {
           normaly = -1;
+          face = "bottom";
         }
         if (objPoint[2] === 0.5) {
           normalz = 1;
+          face = "front";
         }
         if (objPoint[2] === -0.5) {
           normalz = -1;
+          face = "back";
         }
-        console.log();
+        let u: number, v: number;
+        switch (face) {
+          case "top":
+            u = 0.25 + (objPoint[0] + 0.5) / 4;
+            v = 0.5 + (objPoint[2] + 0.5) / 4;
+            break;
+          case "bottom":
+            u = 0.25 + (objPoint[0] + 0.5) / 4;
+            v = (objPoint[2] + 0.5) / 4;
+            break;
+          case "left":
+            u = (objPoint[2] + 0.5) / 4;
+            v = 0.25 + (objPoint[1] + 0.5) / 4;
+            break;
+          case "right":
+            u = 0.5 + (objPoint[2] + 0.5) / 4;
+            v = 0.25 + (objPoint[1] + 0.5) / 4;
+            break;
+          case "front":
+            u = 0.25 + (objPoint[0] + 0.5) / 4;
+            v = 0.25 + (objPoint[1] + 0.5) / 4;
+            break;
+          case "back":
+            u = 0.75 + (objPoint[0] + 0.5) / 4;
+            v = 0.25 + (objPoint[1] + 0.5) / 4;
+            break;
+        }
+        hit.setTcoord(vec2.fromValues(u, v));
+
         const normal: vec4 = vec4.normalize(
           vec4.create(),
           vec4.transformMat4(
             vec4.create(),
             vec4.fromValues(normalx, normaly, normalz, 0),
-            mat4.invert(
+            mat4.transpose(
               mat4.create(),
-              mat4.transpose(mat4.create(), modelView.peek())
+              mat4.invert(mat4.create(), modelView.peek())
             )
           )
         );
+
         hit.setNormal(normal);
         return hit;
       }
@@ -200,15 +236,27 @@ export class LeafNode extends SGNode {
         hit.setMaterial(this.material);
         hit.setIntersection(r.point(hit.getT()));
         const objPoint = objRay.point(hit.getT());
+        const normalV = vec4.fromValues(
+          objPoint[0],
+          objPoint[1],
+          objPoint[2],
+          0
+        );
         const normal: vec4 = vec4.normalize(
           vec4.create(),
           vec4.transformMat4(
             vec4.create(),
-            objPoint,
+            normalV,
             mat4.invert(
               mat4.create(),
               mat4.transpose(mat4.create(), modelView.peek())
             )
+          )
+        );
+        hit.setTcoord(
+          vec2.fromValues(
+            Math.atan2(objPoint[0], objPoint[2]) / (2 * Math.PI) + 0.5,
+            objPoint[1] * 0.5 + 0.5
           )
         );
         hit.setNormal(normal);

@@ -240,6 +240,69 @@ export namespace ScenegraphJSONImporter {
     return result;
   }
 
+  export function handleMaterial(obj: Object): Material {
+    let mat: Material = new Material();
+
+    if ("ambient" in obj) {
+      let values: number[] = convertToArray(obj["ambient"]);
+      if (values.length != 4) {
+        throw new Error("4 values needed for ambient");
+      }
+      mat.setAmbient(values);
+    }
+
+    if ("diffuse" in obj) {
+      let values: number[] = convertToArray(obj["diffuse"]);
+      if (values.length != 4) {
+        throw new Error("4 values needed for diffuse");
+      }
+      mat.setDiffuse(values);
+    }
+
+    if ("specular" in obj) {
+      let values: number[] = convertToArray(obj["specular"]);
+      if (values.length != 4) {
+        throw new Error("4 values needed for specular");
+      }
+      mat.setSpecular(values);
+    }
+
+    if ("emissive" in obj) {
+      let values: number[] = convertToArray(obj["emissive"]);
+      if (values.length != 4) {
+        throw new Error("4 values needed for emissive");
+      }
+      mat.setEmission(values);
+    }
+
+    if ("shininess" in obj) {
+      let value: number = parseFloat(obj["shininess"]);
+      mat.setShininess(value);
+    }
+
+    if ("absorption" in obj) {
+      let value: number = parseFloat(obj["absorption"]);
+      mat.setAbsorption(value);
+    }
+
+    if ("reflection" in obj) {
+      let value: number = parseFloat(obj["reflection"]);
+      mat.setReflection(value);
+    }
+
+    if ("transparency" in obj) {
+      let value: number = parseFloat(obj["transparency"]);
+      mat.setTransparency(value);
+    }
+
+    if ("refractive_index" in obj) {
+      let value: number = parseFloat(obj["refractive_index"]);
+      mat.setRefractiveIndex(value);
+    }
+
+    return mat;
+  }
+
   export function handleGroupNode<VertexType extends IVertexData>(
     scenegraph: Scenegraph<VertexType>,
     obj: Object
@@ -273,32 +336,9 @@ export namespace ScenegraphJSONImporter {
     result = new LeafNode(obj["instanceof"], scenegraph, nodeName);
 
     if ("material" in obj) {
-      if ("color" in obj["material"]) {
-        material.setAmbient([
-          obj["material"]["color"][0],
-          obj["material"]["color"][1],
-          obj["material"]["color"][2]
-        ]);
-      } else {
-        material.setAmbient([
-          obj["material"]["ambient"][0],
-          obj["material"]["ambient"][1],
-          obj["material"]["ambient"][2]
-        ]);
-        material.setDiffuse([
-          obj["material"]["diffuse"][0],
-          obj["material"]["diffuse"][1],
-          obj["material"]["diffuse"][2]
-        ]);
-        material.setSpecular([
-          obj["material"]["specular"][0],
-          obj["material"]["specular"][1],
-          obj["material"]["specular"][2]
-        ]);
-        material.setShininess(obj["material"]["shininess"]);
-      }
-      result.setMaterial(material);
+      material = handleMaterial(obj["material"]);
     }
+    result.setMaterial(material);
     if ("texture" in obj) {
       result.setTextureName(obj["texture"]);
     } else {

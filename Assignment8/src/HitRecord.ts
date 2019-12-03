@@ -1,4 +1,4 @@
-import { vec4, mat3 } from "gl-matrix";
+import { vec4, vec2, mat3 } from "gl-matrix";
 import { Material } from "%COMMON/Material";
 import { TextureObject } from "%COMMON/TextureObject";
 
@@ -7,7 +7,7 @@ export class HitRecord {
   private intersection: vec4;
   private normal: vec4;
   private material: Material;
-  private tcoord: vec4;
+  private tcoord: vec2;
   private texture: string;
 
   constructor(t: number) {
@@ -42,11 +42,11 @@ export class HitRecord {
     this.material = m;
   }
 
-  public getTcoord(): vec4 {
+  public getTcoord(): vec2 {
     return this.tcoord;
   }
 
-  public setTcoord(coord: vec4) {
+  public setTcoord(coord: vec2) {
     this.tcoord = coord;
   }
 

@@ -4,18 +4,21 @@ import { Scenegraph } from "./Scenegraph";
 import { VertexPNT, VertexPNTProducer } from "./VertexPNT";
 import { ScenegraphRenderer } from "./ScenegraphRenderer";
 import { ScenegraphJSONImporter } from "./ScenegraphJSONImporter";
-import { sphere, cone, hogwartsOfficial } from "./Scene";
+import { sphere, cone, hogwartsOfficial, box } from "./Scene";
 import { Stack } from "%COMMON/Stack";
 import { mat4, vec3, vec4, glMatrix, mat3 } from "gl-matrix";
 import { Material } from "%COMMON/Material";
-import { TextureObject } from "%COMMON/TextureObject";
+import { RayTextureObject } from "./RayTextureObject";
 
 export class RTView {
   private canvas: HTMLCanvasElement;
   private scenegraph: Scenegraph<VertexPNT>;
   private modelview: Stack<mat4>;
+  private textures: Map<string, RayTextureObject>;
+  private backgroundColor: vec3;
 
   constructor() {
+    this.textures = new Map<string, RayTextureObject>();
     this.canvas = <HTMLCanvasElement>document.querySelector("#raytraceCanvas");
     if (!this.canvas) {
       console.log("Failed to retrieve the <canvas> element");
@@ -27,13 +30,26 @@ export class RTView {
     );
     button.addEventListener("click", ev => this.saveCanvas());
     this.modelview = new Stack<mat4>();
+    // this.backgroundColor = vec3.fromValues(0.7, 0.7, 0.7);
+    this.backgroundColor = vec3.fromValues(0, 0, 0);
   }
 
   public initScenegraph(): void {
-    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), cone()).then(
+    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), sphere()).then(
       (s: Scenegraph<VertexPNT>) => {
         this.scenegraph = s;
-        this.fillCanvas();
+        const textureMap = this.scenegraph.getTextures();
+        const promises = [];
+        for (const key of textureMap.keys()) {
+          const name = key;
+          const src = textureMap.get(key);
+          let textureObject = new RayTextureObject(name, src);
+          this.textures.set(name, textureObject);
+          promises.push(textureObject.load());
+        }
+        Promise.all(promises).then(() => {
+          this.fillCanvas();
+        });
       }
     );
     //set it up
@@ -65,10 +81,11 @@ export class RTView {
         let color: vec3;
         const hit = this.raycast(r, modelview);
         if (!!hit) {
-          color = this.shade(x, y, hit, modelview);
+          color = this.shade(x, y, hit, modelview, r, 0);
+
           // color = vec3.fromValues(1, 1, 1);
         } else {
-          color = vec3.fromValues(0, 0, 0);
+          color = this.backgroundColor;
         }
         //set color
         imageData.data[4 * ((height - y) * width + x)] = color[0] * 255;
@@ -84,7 +101,9 @@ export class RTView {
     x: number,
     y: number,
     hit: HitRecord,
-    modelview: Stack<mat4>
+    modelview: Stack<mat4>,
+    ray: Ray,
+    bounce: number
   ): vec3 {
     const lights = this.scenegraph.getLights(modelview);
     let result: vec3 = vec3.fromValues(0, 0, 0);
@@ -94,6 +113,31 @@ export class RTView {
         hit.getIntersection()[1],
         hit.getIntersection()[2]
       );
+      const shadowDirection = vec4.sub(
+        vec4.create(),
+        light.getPosition(),
+        hit.getIntersection()
+      );
+      let shadow = 1;
+      const shadowStart = vec4.add(
+        vec4.create(),
+        hit.getIntersection(),
+        vec4.scale(vec4.create(), shadowDirection, 0.001)
+      );
+      const shadowRay = new Ray(shadowStart, shadowDirection);
+      const shadowHit = this.raycast(shadowRay, modelview);
+      if (!!shadowHit) {
+        const tL = vec4.div(
+          vec4.create(),
+          vec4.sub(vec4.create(), light.getPosition(), shadowRay.getStart()),
+          shadowRay.getDirection()
+        );
+        let possible = [tL[0], tL[1], tL[2]];
+        possible = possible.filter(t => !isNaN(t));
+        if (shadowHit.getT() < possible[0]) {
+          shadow = 0;
+        }
+      }
       let lightVec: vec3;
       if (light.getPosition()[3] != 0) {
         lightVec = vec3.normalize(
@@ -190,7 +234,71 @@ export class RTView {
         vec3.add(result, result, diffuse);
         vec3.add(result, result, specular);
       }
+      vec3.scale(result, result, shadow);
     });
+
+    const tCoord = hit.getTcoord();
+    const u = tCoord[0];
+    const v = tCoord[1];
+    const textureObject = this.textures.get(hit.getTexture());
+    const textureColor = textureObject.getColor(u, v);
+    vec3.multiply(
+      result,
+      result,
+      vec3.fromValues(
+        textureColor[0] / 255,
+        textureColor[1] / 255,
+        textureColor[2] / 255
+      )
+    );
+
+    const material = hit.getMaterial();
+    if (material.getReflection() > 0) {
+      const normal = vec4.normalize(
+        vec4.create(),
+        vec4.fromValues(
+          hit.getNormal()[0],
+          hit.getNormal()[1],
+          hit.getNormal()[2],
+          0
+        )
+      );
+      const twoDot = 2 * vec4.dot(normal, ray.getDirection());
+      const reflectionDirection = vec4.sub(
+        vec4.create(),
+        ray.getDirection(),
+        vec4.scale(vec4.create(), normal, twoDot)
+      );
+      const reflectionStart = vec4.add(
+        vec4.create(),
+        hit.getIntersection(),
+        vec4.scale(vec4.create(), normal, 0.0001)
+      );
+      // const reflectionStart = hit.getIntersection();
+      const reflectionRay = new Ray(reflectionStart, reflectionDirection);
+      const reflectionHit = this.raycast(reflectionRay, modelview);
+
+      if (bounce < 10) {
+        let reflectionColor;
+        if (!!reflectionHit) {
+          reflectionColor = this.shade(
+            x,
+            y,
+            reflectionHit,
+            modelview,
+            reflectionRay,
+            bounce + 1
+          );
+        } else {
+          reflectionColor = this.backgroundColor;
+        }
+        return vec3.add(
+          vec3.create(),
+          vec3.scale(vec3.create(), result, material.getAbsorption()),
+          vec3.scale(vec3.create(), reflectionColor, material.getReflection())
+        );
+      }
+    }
 
     return result;
   }
@@ -204,18 +312,18 @@ export class RTView {
     let height: number = Number(this.canvas.getAttribute("height"));
     this.modelview.push(mat4.create());
     this.modelview.push(mat4.clone(this.modelview.peek()));
-    mat4.lookAt(
-      this.modelview.peek(),
-      vec3.fromValues(100, 100, 120),
-      vec3.fromValues(70, 30, -10),
-      vec3.fromValues(0, 1, 0)
-    );
     // mat4.lookAt(
     //   this.modelview.peek(),
-    //   vec3.fromValues(0, 0, -10),
-    //   vec3.fromValues(0, 0, 0),
+    //   vec3.fromValues(100, 100, 120),
+    //   vec3.fromValues(70, 30, -10),
     //   vec3.fromValues(0, 1, 0)
     // );
+    mat4.lookAt(
+      this.modelview.peek(),
+      vec3.fromValues(0, 15, -50),
+      vec3.fromValues(0, 0, 0),
+      vec3.fromValues(0, 1, 0)
+    );
     this.raytrace(width, height, this.modelview);
   }
 }
