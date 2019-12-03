@@ -19822,6 +19822,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     exports.hogwartsOfficial = hogwartsOfficial;
     function sphere() {
         return `{
+      "scaleinstances": "false",
         "instances": [
           {
             "name": "sphere",

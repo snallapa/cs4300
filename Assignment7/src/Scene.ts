@@ -2088,6 +2088,7 @@ export function hogwartsOfficial() {
 
 export function sphere() {
   return `{
+      "scaleinstances": "false",
         "instances": [
           {
             "name": "sphere",
