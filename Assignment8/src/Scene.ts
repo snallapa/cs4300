@@ -2271,8 +2271,8 @@ export function sphere() {
                 "material": {
                   "ambient": [
                     1,
-                    1,
-                    1,
+                    0,
+                    0,
                     1.0
                   ],
                   "diffuse": [
@@ -2294,8 +2294,8 @@ export function sphere() {
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 0.5,
-                  "reflection": 0.5,
+                  "absorption": 0.3,
+                  "reflection": 0.7,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }

@@ -16,6 +16,7 @@ export class RTView {
   private modelview: Stack<mat4>;
   private textures: Map<string, RayTextureObject>;
   private backgroundColor: vec3;
+  private DEPTH_LEVEL: number = 10;
 
   constructor() {
     this.textures = new Map<string, RayTextureObject>();
@@ -35,7 +36,7 @@ export class RTView {
   }
 
   public initScenegraph(): void {
-    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), cone()).then(
+    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), sphere()).then(
       (s: Scenegraph<VertexPNT>) => {
         this.scenegraph = s;
         const textureMap = this.scenegraph.getTextures();
@@ -81,7 +82,7 @@ export class RTView {
         let color: vec3;
         const hit = this.raycast(r, modelview);
         if (!!hit) {
-          color = this.shade(x, y, hit, modelview, r, 0);
+          color = this.shade(hit, modelview, r, 0);
 
           // color = vec3.fromValues(1, 1, 1);
         } else {
@@ -98,8 +99,6 @@ export class RTView {
   }
 
   private shade(
-    x: number,
-    y: number,
     hit: HitRecord,
     modelview: Stack<mat4>,
     ray: Ray,
@@ -274,16 +273,13 @@ export class RTView {
         hit.getIntersection(),
         vec4.scale(vec4.create(), normal, 0.0001)
       );
-      // const reflectionStart = hit.getIntersection();
       const reflectionRay = new Ray(reflectionStart, reflectionDirection);
       const reflectionHit = this.raycast(reflectionRay, modelview);
 
-      if (bounce < 10) {
+      if (bounce < this.DEPTH_LEVEL) {
         let reflectionColor;
         if (!!reflectionHit) {
           reflectionColor = this.shade(
-            x,
-            y,
             reflectionHit,
             modelview,
             reflectionRay,

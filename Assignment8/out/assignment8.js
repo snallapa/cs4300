@@ -17676,6 +17676,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     Object.defineProperty(exports, "__esModule", { value: true });
     class RTView {
         constructor() {
+            this.DEPTH_LEVEL = 10;
             this.textures = new Map();
             this.canvas = document.querySelector("#raytraceCanvas");
             if (!this.canvas) {
@@ -17690,7 +17691,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.backgroundColor = gl_matrix_1.vec3.fromValues(0, 0, 0);
         }
         initScenegraph() {
-            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.cone()).then((s) => {
+            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.sphere()).then((s) => {
                 this.scenegraph = s;
                 const textureMap = this.scenegraph.getTextures();
                 const promises = [];
@@ -17724,7 +17725,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     let color;
                     const hit = this.raycast(r, modelview);
                     if (!!hit) {
-                        color = this.shade(x, y, hit, modelview, r, 0);
+                        color = this.shade(hit, modelview, r, 0);
                         // color = vec3.fromValues(1, 1, 1);
                     }
                     else {
@@ -17739,7 +17740,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             }
             this.canvas.getContext("2d").putImageData(imageData, 0, 0);
         }
-        shade(x, y, hit, modelview, ray, bounce) {
+        shade(hit, modelview, ray, bounce) {
             const lights = this.scenegraph.getLights(modelview);
             let result = gl_matrix_1.vec3.fromValues(0, 0, 0);
             lights.forEach(light => {
@@ -17797,13 +17798,12 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 const twoDot = 2 * gl_matrix_1.vec4.dot(normal, ray.getDirection());
                 const reflectionDirection = gl_matrix_1.vec4.sub(gl_matrix_1.vec4.create(), ray.getDirection(), gl_matrix_1.vec4.scale(gl_matrix_1.vec4.create(), normal, twoDot));
                 const reflectionStart = gl_matrix_1.vec4.add(gl_matrix_1.vec4.create(), hit.getIntersection(), gl_matrix_1.vec4.scale(gl_matrix_1.vec4.create(), normal, 0.0001));
-                // const reflectionStart = hit.getIntersection();
                 const reflectionRay = new Ray_1.Ray(reflectionStart, reflectionDirection);
                 const reflectionHit = this.raycast(reflectionRay, modelview);
-                if (bounce < 10) {
+                if (bounce < this.DEPTH_LEVEL) {
                     let reflectionColor;
                     if (!!reflectionHit) {
-                        reflectionColor = this.shade(x, y, reflectionHit, modelview, reflectionRay, bounce + 1);
+                        reflectionColor = this.shade(reflectionHit, modelview, reflectionRay, bounce + 1);
                     }
                     else {
                         reflectionColor = this.backgroundColor;
@@ -20319,8 +20319,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 "material": {
                   "ambient": [
                     1,
-                    1,
-                    1,
+                    0,
+                    0,
                     1.0
                   ],
                   "diffuse": [
@@ -20342,8 +20342,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 0.5,
-                  "reflection": 0.5,
+                  "absorption": 0.3,
+                  "reflection": 0.7,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }
@@ -21589,7 +21589,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             this.shaderLocations = new ShaderLocationsVault_1.ShaderLocationsVault(this.gl, this.shaderProgram);
         }
         initScenegraph() {
-            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.cone()).then((s) => {
+            ScenegraphJSONImporter_1.ScenegraphJSONImporter.importJSON(new VertexPNT_1.VertexPNTProducer(), Scene_1.sphere()).then((s) => {
                 this.scenegraph = s;
                 this.initShaders(this.getPhongVShader(), this.getPhongFShader(this.scenegraph.getNumberLight()));
                 let shaderVarsToVertexAttribs = new Map();

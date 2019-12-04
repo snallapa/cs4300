@@ -79,7 +79,7 @@ export class View {
   }
 
   public initScenegraph(): void {
-    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), cone()).then(
+    ScenegraphJSONImporter.importJSON(new VertexPNTProducer(), sphere()).then(
       (s: Scenegraph<VertexPNT>) => {
         this.scenegraph = s;
 
