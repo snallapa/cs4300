@@ -2186,8 +2186,8 @@ export function sphere() {
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 0.1,
-                  "reflection": 0.9,
+                  "absorption": 1,
+                  "reflection": 0,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }
@@ -2240,8 +2240,8 @@ export function sphere() {
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 0.2,
-                  "reflection": 0.8,
+                  "absorption": 1,
+                  "reflection": 0,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }
@@ -2294,8 +2294,8 @@ export function sphere() {
                     1.0
                   ],
                   "shininess": 1.0,
-                  "absorption": 0.3,
-                  "reflection": 0.7,
+                  "absorption": 0.4,
+                  "reflection": 0.6,
                   "transparency": 0.0,
                   "refractive_index": 0.0
                 }
@@ -2463,12 +2463,13 @@ export function cylinder() {
                 0.8
               ],
               "position": [
-                0.0,
-                0.0,
+                10.0,
+                20.0,
                 -20.0,
                 1.0
               ]
             }
+            
 
           ],
           "children": [
@@ -2486,7 +2487,6 @@ export function cylinder() {
               "child": {
                 "type": "object",
                 "instanceof": "cylinder",
-                "texture": "checkerboard",
                 "material": {
                   "ambient": [
                     1,
